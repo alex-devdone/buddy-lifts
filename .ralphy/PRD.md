@@ -35,7 +35,7 @@
 - [x] Create `packages/api/src/routers/exercise-parser.ts` - AI-powered text-to-exercises mutation using LLM (parse "10x4 pushup, 10,10,8,6 pull ups between" -> structured exercises)
 - [x] Create `packages/api/src/routers/session.ts` - start/end sessions, generate invite codes, join session
 - [x] Create `packages/api/src/routers/progress.ts` - record exercise completion, calculate percentages
-- [ ] Create `packages/api/src/routers/friend.ts` - send/accept/reject/remove friend requests
+- [x] Create `packages/api/src/routers/friend.ts` - send/accept/reject/remove friend requests
 - [ ] Create `packages/api/src/routers/ai-summary.ts` - generate training summary comparing participants' performance
 - [x] Register all routers in `packages/api/src/routers/index.ts`
 
