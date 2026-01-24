@@ -1,6 +1,5 @@
-import { db } from "@buddy-lifts/db";
+import { db, eq } from "@buddy-lifts/db";
 import { todo } from "@buddy-lifts/db/schema/todo";
-import { eq } from "drizzle-orm";
 import z from "zod";
 
 import { publicProcedure, router } from "../index";

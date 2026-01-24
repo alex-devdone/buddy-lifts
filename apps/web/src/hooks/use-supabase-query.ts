@@ -1,14 +1,15 @@
-import type { PostgrestFilterBuilder } from "@supabase/postgrest-js";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { createClient as createBrowserClient } from "@/lib/supabase/client";
+
+type SupabaseClient = ReturnType<typeof createBrowserClient>;
 
 interface UseSupabaseQueryOptions<T> {
 	/**
 	 * Query builder function
 	 */
 	queryFn: (
-		supabase: ReturnType<typeof createBrowserClient>,
-	) => PostgrestFilterBuilder<unknown, unknown, T[]>;
+		supabase: SupabaseClient,
+	) => PromiseLike<{ data: T[] | null; error: Error | null }>;
 	/**
 	 * Enable real-time subscriptions
 	 */
