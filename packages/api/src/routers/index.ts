@@ -1,5 +1,6 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
 import { exerciseRouter } from "./exercise";
+import { exerciseParserRouter } from "./exercise-parser";
 import { progressRouter } from "./progress";
 import { sessionRouter } from "./session";
 import { todoRouter } from "./todo";
@@ -18,6 +19,7 @@ export const appRouter = router({
 	todo: todoRouter,
 	training: trainingRouter,
 	exercise: exerciseRouter,
+	exerciseParser: exerciseParserRouter,
 	session: sessionRouter,
 	progress: progressRouter,
 });
