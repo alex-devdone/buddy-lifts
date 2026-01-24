@@ -1,24 +1,24 @@
 {
-  "name": "@buddy-lifts/auth",
-  "type": "module",
-  "exports": {
-    ".": {
-      "default": "./src/index.ts"
-    },
-    "./*": {
-      "default": "./src/*.ts"
-    }
-  },
-  "scripts": {},
-  "dependencies": {
-    "@buddy-lifts/db": "workspace:*",
-    "@buddy-lifts/env": "workspace:*",
-    "better-auth": "catalog:",
-    "dotenv": "catalog:",
-    "zod": "catalog:"
-  },
-  "devDependencies": {
-    "@buddy-lifts/config": "workspace:*",
-    "typescript": "catalog:"
-  }
+	"name": "@buddy-lifts/auth",
+	"type": "module",
+	"exports": {
+		".": {
+			"default": "./src/index.ts"
+		},
+		"./*": {
+			"default": "./src/*.ts"
+		}
+	},
+	"scripts": {},
+	"dependencies": {
+		"@buddy-lifts/db": "workspace:*",
+		"@buddy-lifts/env": "workspace:*",
+		"better-auth": "catalog:",
+		"dotenv": "catalog:",
+		"zod": "catalog:"
+	},
+	"devDependencies": {
+		"@buddy-lifts/config": "workspace:*",
+		"typescript": "catalog:"
+	}
 }
