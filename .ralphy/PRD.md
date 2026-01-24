@@ -31,7 +31,7 @@
 
 ### tRPC Routers
 - [x] Create `packages/api/src/routers/training.ts` - create, update, delete trainings (protectedProcedure)
-- [ ] Create `packages/api/src/routers/exercise.ts` - CRUD for exercises within trainings
+- [x] Create `packages/api/src/routers/exercise.ts` - CRUD for exercises within trainings
 - [ ] Create `packages/api/src/routers/exercise-parser.ts` - AI-powered text-to-exercises mutation using LLM (parse "10x4 pushup, 10,10,8,6 pull ups between" -> structured exercises)
 - [ ] Create `packages/api/src/routers/session.ts` - start/end sessions, generate invite codes, join session
 - [ ] Create `packages/api/src/routers/progress.ts` - record exercise completion, calculate percentages
