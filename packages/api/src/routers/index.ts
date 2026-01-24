@@ -1,5 +1,6 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
 import { exerciseRouter } from "./exercise";
+import { sessionRouter } from "./session";
 import { todoRouter } from "./todo";
 import { trainingRouter } from "./training";
 
@@ -16,5 +17,6 @@ export const appRouter = router({
 	todo: todoRouter,
 	training: trainingRouter,
 	exercise: exerciseRouter,
+	session: sessionRouter,
 });
 export type AppRouter = typeof appRouter;

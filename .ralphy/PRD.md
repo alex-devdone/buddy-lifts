@@ -33,15 +33,15 @@
 - [x] Create `packages/api/src/routers/training.ts` - create, update, delete trainings (protectedProcedure)
 - [x] Create `packages/api/src/routers/exercise.ts` - CRUD for exercises within trainings
 - [ ] Create `packages/api/src/routers/exercise-parser.ts` - AI-powered text-to-exercises mutation using LLM (parse "10x4 pushup, 10,10,8,6 pull ups between" -> structured exercises)
-- [ ] Create `packages/api/src/routers/session.ts` - start/end sessions, generate invite codes, join session
+- [x] Create `packages/api/src/routers/session.ts` - start/end sessions, generate invite codes, join session
 - [ ] Create `packages/api/src/routers/progress.ts` - record exercise completion, calculate percentages
 - [ ] Create `packages/api/src/routers/friend.ts` - send/accept/reject/remove friend requests
 - [ ] Create `packages/api/src/routers/ai-summary.ts` - generate training summary comparing participants' performance
 - [ ] Register all routers in `packages/api/src/routers/index.ts`
 
 ### Invite System
-- [ ] Create invite code generator utility in `packages/api/src/utils/invite-code.ts` (nanoid-based, 8 chars)
-- [ ] Add invite validation and expiry logic in session router
+- [x] Create invite code generator utility in `packages/api/src/utils/invite-code.ts` (nanoid-based, 8 chars)
+- [x] Add invite validation and expiry logic in session router
 
 ### Email Notifications (Supabase Edge Functions)
 - [ ] Create Supabase Edge Function `supabase/functions/notify-join/index.ts` - email when someone joins training
