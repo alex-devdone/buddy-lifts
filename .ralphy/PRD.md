@@ -23,8 +23,8 @@
 - [x] Run `bun run db:push` to sync schema with Supabase
 
 ### Authentication Enhancement
-- [ ] Add Google OAuth provider to `packages/auth/src/index.ts` using Better-Auth socialProviders
-- [ ] Update `apps/web/src/lib/auth-client.ts` with Google sign-in method
+- [x] Add Google OAuth provider to `packages/auth/src/index.ts` using Better-Auth socialProviders
+- [x] Update `apps/web/src/lib/auth-client.ts` with Google sign-in method
 - [ ] Create Google OAuth credentials in Google Cloud Console (manual step - document in README)
 
 ## Phase 2: Core Backend (parallel_group: 2)
