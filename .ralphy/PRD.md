@@ -13,14 +13,14 @@
 ## Phase 1: Foundation (parallel_group: 1)
 
 ### Database Schema
-- [ ] Create `packages/db/src/schema/training.ts` - trainings table (id, userId, name, description, createdAt, updatedAt)
-- [ ] Create `packages/db/src/schema/exercise.ts` - exercises table (id, trainingId, name, targetSets, targetReps, weight, order, restSeconds)
-- [ ] Create `packages/db/src/schema/training-session.ts` - active sessions (id, trainingId, hostUserId, inviteCode, accessType, status, startedAt, completedAt)
-- [ ] Create `packages/db/src/schema/session-participant.ts` - participants (id, sessionId, odUserId, role: host/admin/read, joinedAt)
-- [ ] Create `packages/db/src/schema/exercise-progress.ts` - per-exercise progress (id, sessionId, odUserId, exerciseId, completedReps JSON array, completedAt)
-- [ ] Create `packages/db/src/schema/friend.ts` - friendships (id, userId, friendId, status: pending/accepted/blocked, createdAt)
-- [ ] Export all schemas from `packages/db/src/schema/index.ts`
-- [ ] Run `bun run db:push` to sync schema with Supabase
+- [x] Create `packages/db/src/schema/training.ts` - trainings table (id, userId, name, description, createdAt, updatedAt)
+- [x] Create `packages/db/src/schema/exercise.ts` - exercises table (id, trainingId, name, targetSets, targetReps, weight, order, restSeconds)
+- [x] Create `packages/db/src/schema/training-session.ts` - active sessions (id, trainingId, hostUserId, inviteCode, accessType, status, startedAt, completedAt)
+- [x] Create `packages/db/src/schema/session-participant.ts` - participants (id, sessionId, odUserId, role: host/admin/read, joinedAt)
+- [x] Create `packages/db/src/schema/exercise-progress.ts` - per-exercise progress (id, sessionId, odUserId, exerciseId, completedReps JSON array, completedAt)
+- [x] Create `packages/db/src/schema/friend.ts` - friendships (id, userId, friendId, status: pending/accepted/blocked, createdAt)
+- [x] Export all schemas from `packages/db/src/schema/index.ts`
+- [x] Run `bun run db:push` to sync schema with Supabase
 
 ### Authentication Enhancement
 - [ ] Add Google OAuth provider to `packages/auth/src/index.ts` using Better-Auth socialProviders

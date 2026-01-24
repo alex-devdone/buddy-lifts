@@ -1,0 +1,1 @@
+2026-01-25 - Phase 1 Database Schema: Created all database tables (training, exercise, trainingSession, sessionParticipant, exerciseProgress, friend) in packages/db/src/schema/training.ts with proper relations and indexes. Exported schemas and ran db:push to sync with Supabase. Linting and build passed.
