@@ -1,0 +1,29 @@
+{
+  "name": "@buddy-lifts/api",
+  "type": "module",
+  "exports": {
+    ".": {
+      "default": "./src/index.ts"
+    },
+    "./*": {
+      "default": "./src/*.ts"
+    }
+  },
+  "scripts": {},
+  "dependencies": {
+    "@buddy-lifts/auth": "workspace:*",
+    "@buddy-lifts/db": "workspace:*",
+    "@buddy-lifts/env": "workspace:*",
+    "@trpc/client": "catalog:",
+    "@trpc/server": "catalog:",
+    "@types/pg": "catalog:",
+    "dotenv": "catalog:",
+    "drizzle-orm": "catalog:",
+    "next": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@buddy-lifts/config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}
