@@ -38,6 +38,7 @@
 		"@buddy-lifts/env": "workspace:*",
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.91.1",
+		"date-fns": "^4.1.0",
 		"dotenv": "catalog:",
 		"drizzle-orm": "0.45.1",
 		"nanoid": "^5.1.6",

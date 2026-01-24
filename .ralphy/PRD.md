@@ -51,7 +51,7 @@
 ## Phase 3: UI Components (parallel_group: 3)
 
 ### Training Management
-- [ ] Create `apps/web/src/components/training/training-card.tsx` - training preview card
+- [x] Create `apps/web/src/components/training/training-card.tsx` - training preview card
 - [ ] Create `apps/web/src/components/training/training-form.tsx` - create/edit training form
 - [ ] Create `apps/web/src/components/training/exercise-parser-input.tsx` - natural language input with AI parsing
 - [ ] Create `apps/web/src/components/training/exercise-list.tsx` - sortable exercise list with drag-drop
