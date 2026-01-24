@@ -3,39 +3,48 @@
 
 # Project info (auto-detected, edit if needed)
 project:
-  name: "my-procedures-2"
+  name: "buddy-lifts"
   language: "TypeScript"
-  framework: "Next.js (Turborepo Monorepo)"
-  description: "Modern full-stack TypeScript monorepo built with Next.js, tRPC, Better-Auth, Drizzle ORM, and PostgreSQL"
+  framework: "Next.js 16 (Turborepo Monorepo)"
+  description: "TypeScript monorepo built with Better-T-Stack featuring Next.js, tRPC, Drizzle ORM, Better-Auth, and Supabase"
 
 # Commands (auto-detected from package.json/pyproject.toml)
 commands:
-  test: "bash .claude/skills/test-runner/scripts/run-unit-tests.sh"
-  lint: "bash .claude/skills/test-runner/scripts/run-lint.sh"
-  build: "bun run build"
-  test:e2e: "bash .claude/skills/test-runner/scripts/run-e2e-tests.sh"
+  test: "bun run test | tail -n 30"
+  lint: "bun run check | tail -n 30"
+  build: "bun run build | tail -n 30"
+  dev: "bun run dev"
+  dev:web: "bun run dev:web"
+  check-types: "bun run check-types | tail -n 30"
+  db:push: "bun run db:push"
+  db:studio: "bun run db:studio"
 
 # Rules - instructions the AI MUST follow
 # These are injected into every prompt
 rules:
   - "Always use TypeScript with strict mode enabled"
-  - "Use tRPC for all API endpoints to maintain end-to-end type safety"
-  - "Use Drizzle ORM for all database operations - never write raw SQL unless absolutely necessary"
-  - "Use Better-Auth for authentication - follow the patterns in packages/auth"
-  - "All API inputs must be validated with Zod schemas"
-  - "Follow Biome formatting and linting standards - run 'bun run check' before committing"
+  - "Use tRPC ONLY for mutations/writes - never add tRPC queries"
+  - "Use Supabase client directly for all read operations (hybrid pattern)"
+  - "Use Drizzle ORM for database schema and migrations"
+  - "Use Better-Auth for authentication - follow patterns in packages/auth"
+  - "All tRPC inputs must be validated with Zod schemas"
+  - "Use Biome for formatting/linting - run 'bun run check' before committing"
   - "Use Bun as the package manager, not npm or yarn"
-  - "Follow the monorepo structure: apps/* for applications, packages/* for shared code"
-  - "Use TailwindCSS and shadcn/ui for styling - maintain consistency with existing components"
-  - "Add environment variables to both .env files and turbo.json env array"
+  - "Follow monorepo structure: apps/* for applications, packages/* for shared"
+  - "Use TailwindCSS and shadcn/ui - maintain consistency with existing components"
+  - "Use tab indentation and double quotes (Biome config)"
+  - "Use 'import type' for type-only imports (verbatimModuleSyntax)"
+  - "Use 'protectedProcedure' for authenticated tRPC operations"
 
 # Boundaries - files/folders the AI should not modify
 boundaries:
-  never_touch:
-    - "node_modules/**"
-    - "*.lock"
-    - "bun.lockb"
-    - ".next/**"
-    - "dist/**"
-    - ".turbo/**"
-    - "apps/web/.env.local"
+  - "node_modules/**"
+  - "*.lock"
+  - "bun.lockb"
+  - ".next/**"
+  - "dist/**"
+  - ".turbo/**"
+  - ".git/**"
+  - "apps/web/.env*"
+  - "*.env"
+  - "*.env.local"

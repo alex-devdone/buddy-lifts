@@ -48,15 +48,15 @@ start_all="$(date +%s)"
 log "Run started $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 for run in $(seq 1 "$total_runs"); do
-  run_step "Run ${run}/${total_runs} Step 1/${total_steps} (with --codex)" \
-    ./ralphy.sh --prd .ralphy/PRD.md --codex --create-pr || rc=$?
+  run_step "Run ${run}/${total_runs} Step 2/${total_steps} (with --sonnet)" \
+    ./ralphy.sh --prd .ralphy/PRD.md --sonnet --create-pr || rc=$?
   if [ "${rc:-0}" -eq 2 ]; then
     break
   fi
   unset rc
 
-  run_step "Run ${run}/${total_runs} Step 2/${total_steps} (with --sonnet)" \
-    ./ralphy.sh --prd .ralphy/PRD.md --sonnet --create-pr || rc=$?
+   run_step "Run ${run}/${total_runs} Step 1/${total_steps} (with --codex)" \
+    ./ralphy.sh --prd .ralphy/PRD.md --codex --create-pr || rc=$?
   if [ "${rc:-0}" -eq 2 ]; then
     break
   fi
