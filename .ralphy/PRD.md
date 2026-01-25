@@ -68,7 +68,7 @@
 - [x] Create `apps/web/src/components/session/live-progress-bar.tsx` - real-time progress bar per participant
 
 ### Friend Management
-- [ ] Create `apps/web/src/components/friends/friend-list.tsx` - list with remove action
+- [x] Create `apps/web/src/components/friends/friend-list.tsx` - list with remove action
 - [ ] Create `apps/web/src/components/friends/friend-request-card.tsx` - accept/reject UI
 - [ ] Create `apps/web/src/components/friends/add-friend-dialog.tsx` - search and send request
 
