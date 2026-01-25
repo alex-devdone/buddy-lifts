@@ -181,7 +181,7 @@ export function InviteLinkDialog({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			{trigger ?? <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>}
+			{trigger ?? <DialogTrigger>{defaultTrigger}</DialogTrigger>}
 			<DialogContent className="max-w-md">
 				<DialogHeader>
 					<DialogTitle>Share Invite Link</DialogTitle>
@@ -286,7 +286,7 @@ export function InviteLinkDialog({
 				</div>
 
 				<DialogFooter>
-					<DialogClose asChild>
+					<DialogClose>
 						<Button variant="outline">Done</Button>
 					</DialogClose>
 				</DialogFooter>

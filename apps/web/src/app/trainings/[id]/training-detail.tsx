@@ -139,7 +139,7 @@ export function TrainingDetail({
 	};
 
 	const handleEdit = () => {
-		setEditingTraining(training);
+		setEditingTraining(training?.[0]);
 		setIsEditDialogOpen(true);
 	};
 
@@ -206,9 +206,9 @@ export function TrainingDetail({
 		);
 	}
 
-	const isOwner = currentUserId === training.userId;
+	const isOwner = currentUserId === training[0]?.userId;
 	const exerciseCount = exercises.length;
-	const timeAgo = formatDistanceToNow(new Date(training.createdAt), {
+	const timeAgo = formatDistanceToNow(new Date(training[0]?.createdAt || ""), {
 		addSuffix: true,
 	});
 
@@ -233,12 +233,12 @@ export function TrainingDetail({
 							<div className="flex items-center gap-2">
 								<Dumbbell className="h-6 w-6 shrink-0 text-primary" />
 								<CardTitle className="text-xl md:text-2xl">
-									{training.name}
+									{training[0]?.name}
 								</CardTitle>
 							</div>
-							{training.description && (
+							{training[0]?.description && (
 								<CardDescription className="line-clamp-2">
-									{training.description}
+									{training[0].description}
 								</CardDescription>
 							)}
 							<div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-muted-foreground text-xs">
@@ -295,7 +295,7 @@ export function TrainingDetail({
 						open={isAddExerciseDialogOpen}
 						onOpenChange={setIsAddExerciseDialogOpen}
 					>
-						<DialogTrigger asChild>
+						<DialogTrigger>
 							<Button variant="default" size="default">
 								<Sparkles className="mr-2 h-4 w-4" />
 								Add Exercises with AI
@@ -344,7 +344,7 @@ export function TrainingDetail({
 					<ExerciseList
 						trainingId={trainingId}
 						currentUserId={currentUserId}
-						trainingUserId={training.userId}
+						trainingUserId={training[0]?.userId}
 					/>
 				)}
 			</div>

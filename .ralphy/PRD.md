@@ -112,7 +112,7 @@
 ### Error Handling & UX
 - [ ] Add loading skeletons for all data-fetching components
 - [ ] Add toast notifications for actions (joined, completed, etc.)
-- [ ] Add error boundaries for session components
+- [x] Add error boundaries for session components
 - [ ] Add offline indicator for real-time connection status
 
 ## Phase 6: Testing & QA (parallel_group: 6)

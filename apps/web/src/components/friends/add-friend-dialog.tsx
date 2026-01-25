@@ -204,7 +204,7 @@ export function AddFriendDialog({
 
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			{trigger ?? <DialogTrigger asChild>{defaultTrigger}</DialogTrigger>}
+			{trigger ?? <DialogTrigger>{defaultTrigger}</DialogTrigger>}
 			<DialogContent className="max-w-md">
 				<DialogHeader>
 					<DialogTitle>Add Friend</DialogTitle>
@@ -389,7 +389,7 @@ export function AddFriendDialog({
 				</div>
 
 				<DialogFooter>
-					<DialogClose asChild>
+					<DialogClose>
 						<Button variant="outline">Cancel</Button>
 					</DialogClose>
 				</DialogFooter>

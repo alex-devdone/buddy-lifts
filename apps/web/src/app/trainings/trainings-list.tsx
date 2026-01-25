@@ -84,7 +84,7 @@ export function TrainingsList({ currentUserId }: TrainingsListProps) {
 			{/* Create Training Button */}
 			<div className="flex justify-end">
 				<Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-					<DialogTrigger asChild>
+					<DialogTrigger>
 						<Button variant="default" size="default">
 							<Plus className="mr-2 h-4 w-4" />
 							Create Training
