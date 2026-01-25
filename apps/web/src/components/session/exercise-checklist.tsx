@@ -1,8 +1,9 @@
 "use client";
 
-import { CheckCircle2, Circle, Dumbbell, Loader2 } from "lucide-react";
+import { CheckCircle2, Circle, Dumbbell, Loader2, PenLine } from "lucide-react";
 import { useCallback, useMemo } from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
@@ -15,6 +16,10 @@ interface ExerciseChecklistProps {
 	trainingId: string;
 	showBodyOverlay?: boolean;
 	className?: string;
+	/** Callback when an exercise is selected for detailed input */
+	onExerciseSelect?: (exerciseId: string) => void;
+	/** Show progress input button instead of checkbox */
+	showProgressInput?: boolean;
 }
 
 interface Exercise {
@@ -63,6 +68,8 @@ export function ExerciseChecklist({
 	trainingId,
 	showBodyOverlay = false,
 	className,
+	onExerciseSelect,
+	showProgressInput = false,
 }: ExerciseChecklistProps) {
 	// Fetch all exercises for the training using Supabase (read)
 	const { data: exercises = [], isLoading: exercisesLoading } =
@@ -231,15 +238,29 @@ export function ExerciseChecklist({
 									: "border-border bg-card",
 							)}
 						>
-							{/* Checkbox */}
-							<Checkbox
-								checked={exercise.isCompleted}
-								onCheckedChange={(checked) =>
-									handleCheckboxChange(exercise, checked === true)
-								}
-								aria-label={`Mark ${exercise.name} as ${exercise.isCompleted ? "incomplete" : "complete"}`}
-								disabled={recordProgress.isPending || deleteProgress.isPending}
-							/>
+							{/* Checkbox or Progress Input Button */}
+							{showProgressInput && onExerciseSelect ? (
+								<Button
+									variant="ghost"
+									size="icon-sm"
+									onClick={() => onExerciseSelect(exercise.id)}
+									className="shrink-0"
+									aria-label={`Input progress for ${exercise.name}`}
+								>
+									<PenLine className="h-4 w-4" />
+								</Button>
+							) : (
+								<Checkbox
+									checked={exercise.isCompleted}
+									onCheckedChange={(checked) =>
+										handleCheckboxChange(exercise, checked === true)
+									}
+									aria-label={`Mark ${exercise.name} as ${exercise.isCompleted ? "incomplete" : "complete"}`}
+									disabled={
+										recordProgress.isPending || deleteProgress.isPending
+									}
+								/>
+							)}
 
 							{/* Exercise Info */}
 							<div className="flex flex-1 items-center justify-between gap-2">
