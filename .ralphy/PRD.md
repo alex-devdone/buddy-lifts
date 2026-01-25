@@ -59,7 +59,7 @@
 ### Session Components
 - [x] Create `apps/web/src/components/session/session-lobby.tsx` - waiting room before starting
 - [x] Create `apps/web/src/components/session/invite-link-dialog.tsx` - generate/copy invite link with access level
-- [ ] Create `apps/web/src/components/session/participant-grid.tsx` - grid layout for 1-3 participants (mobile responsive)
+- [x] Create `apps/web/src/components/session/participant-grid.tsx` - grid layout for 1-3 participants (mobile responsive)
 
 ### Progress Visualization (Mobile-First)
 - [ ] Create `apps/web/src/components/session/body-progress.tsx` - SVG human body with CSS muscle growth animation (0-100%)
