@@ -64,7 +64,7 @@
 ### Progress Visualization (Mobile-First)
 - [x] Create `apps/web/src/components/session/body-progress.tsx` - SVG human body with CSS muscle growth animation (0-100%)
 - [x] Create `apps/web/src/components/session/exercise-checklist.tsx` - checklist overlay on body visualization
-- [ ] Create `apps/web/src/components/session/progress-input.tsx` - input for actual reps completed (e.g., did 8 of 10)
+- [x] Create `apps/web/src/components/session/progress-input.tsx` - input for actual reps completed (e.g., did 8 of 10)
 - [ ] Create `apps/web/src/components/session/live-progress-bar.tsx` - real-time progress bar per participant
 
 ### Friend Management
