@@ -78,7 +78,7 @@
 
 ### AI Summary
 - [x] Create `apps/web/src/components/summary/training-summary.tsx` - post-workout summary with AI analysis
-- [ ] Create `apps/web/src/components/summary/participant-comparison.tsx` - comparison chart between participants
+- [x] Create `apps/web/src/components/summary/participant-comparison.tsx` - comparison chart between participants
 
 ## Phase 4: Pages & Routing (parallel_group: 4)
 
