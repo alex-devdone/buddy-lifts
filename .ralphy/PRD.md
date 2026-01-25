@@ -69,7 +69,7 @@
 
 ### Friend Management
 - [x] Create `apps/web/src/components/friends/friend-list.tsx` - list with remove action
-- [ ] Create `apps/web/src/components/friends/friend-request-card.tsx` - accept/reject UI
+- [x] Create `apps/web/src/components/friends/friend-request-card.tsx` - accept/reject UI
 - [ ] Create `apps/web/src/components/friends/add-friend-dialog.tsx` - search and send request
 
 ### Feed & History
