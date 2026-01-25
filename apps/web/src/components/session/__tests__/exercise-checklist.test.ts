@@ -303,10 +303,11 @@ describe("ExerciseChecklist Component", () => {
 		);
 		const fileContent = await file.text();
 
-		expect(fileContent).toContain("toast.success");
-		expect(fileContent).toContain("Exercise marked as complete");
-		expect(fileContent).toContain("Exercise marked as incomplete");
+		// Toast is still used for error notifications in optimistic update callbacks
 		expect(fileContent).toContain("toast.error");
+		// Check for optimistic update state management
+		expect(fileContent).toContain("setOptimisticUpdates");
+		expect(fileContent).toContain("optimisticUpdates");
 	});
 
 	test("should display completion stats in header", async () => {
@@ -435,5 +436,47 @@ describe("ExerciseChecklist Component", () => {
 
 		expect(fileContent).toContain("trainingId");
 		expect(fileContent).toContain(".eq(");
+	});
+
+	test("should implement optimistic updates for progress recording", async () => {
+		const file = Bun.file(
+			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
+		);
+		const fileContent = await file.text();
+
+		// Should have optimistic state management
+		expect(fileContent).toContain("useState");
+		expect(fileContent).toContain("optimisticUpdates");
+		expect(fileContent).toContain("setOptimisticUpdates");
+
+		// Should include optimistic flag in interface
+		expect(fileContent).toContain("isOptimistic?: boolean");
+
+		// Should update optimistic state immediately on checkbox change
+		expect(fileContent).toContain("handleCheckboxChange");
+		expect(fileContent).toContain("Immediately update UI optimistically");
+
+		// Should have error handling with rollback
+		expect(fileContent).toContain("onError");
+		expect(fileContent).toContain("Rollback optimistic update");
+
+		// Should clear optimistic state on success
+		expect(fileContent).toContain("onSuccess");
+		expect(fileContent).toContain("Clear optimistic state");
+
+		// Should use optimistic state in rendering
+		expect(fileContent).toContain("optimisticState");
+		expect(fileContent).toContain("isOptimistic");
+	});
+
+	test("should show visual feedback for optimistic updates", async () => {
+		const file = Bun.file(
+			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
+		);
+		const fileContent = await file.text();
+
+		// Should have animate-pulse class for optimistic updates
+		expect(fileContent).toContain("animate-pulse");
+		expect(fileContent).toContain("exercise.isOptimistic");
 	});
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import { CheckCircle2, Circle, Dumbbell, Loader2, PenLine } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -45,6 +45,7 @@ interface ExerciseProgress {
 interface ExerciseWithProgress extends Exercise {
 	progress?: ExerciseProgress;
 	isCompleted: boolean;
+	isOptimistic?: boolean;
 }
 
 /**
@@ -71,6 +72,11 @@ export function ExerciseChecklist({
 	onExerciseSelect,
 	showProgressInput = false,
 }: ExerciseChecklistProps) {
+	// Optimistic state for immediate UI feedback
+	const [optimisticUpdates, setOptimisticUpdates] = useState<
+		Map<string, boolean>
+	>(new Map());
+
 	// Fetch all exercises for the training using Supabase (read)
 	const { data: exercises = [], isLoading: exercisesLoading } =
 		useSupabaseQuery<Exercise>({
@@ -102,56 +108,101 @@ export function ExerciseChecklist({
 		return new Map(allProgress.map((p) => [p.exerciseId, p]));
 	}, [allProgress]);
 
-	// Combine exercises with their progress status
+	// Combine exercises with their progress status and optimistic updates
 	const exercisesWithProgress: ExerciseWithProgress[] = useMemo(() => {
 		return exercises.map((exercise) => {
 			const progress = progressMap.get(exercise.id);
+			const optimisticState = optimisticUpdates.get(exercise.id);
+			// Use optimistic state if available, otherwise use actual progress
+			const isCompleted =
+				optimisticState !== undefined
+					? optimisticState
+					: progress?.completedAt !== null;
 			return {
 				...exercise,
 				progress,
-				isCompleted: progress?.completedAt !== null,
+				isCompleted,
+				isOptimistic: optimisticState !== undefined,
 			};
 		});
-	}, [exercises, progressMap]);
+	}, [exercises, progressMap, optimisticUpdates]);
 
-	// tRPC mutation for recording exercise completion
-	const recordProgress = trpc.progress.record.useMutation({
-		onSuccess: () => {
-			toast.success("Exercise marked as complete!");
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
+	// tRPC mutation for recording exercise completion (toast removed, handled in optimistic callback)
+	const recordProgress = trpc.progress.record.useMutation();
 
-	// tRPC mutation for deleting exercise progress
-	const deleteProgress = trpc.progress.delete.useMutation({
-		onSuccess: () => {
-			toast.success("Exercise marked as incomplete.");
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
+	// tRPC mutation for deleting exercise progress (toast removed, handled in optimistic callback)
+	const deleteProgress = trpc.progress.delete.useMutation();
 
-	// Handle checkbox change
+	// Handle checkbox change with optimistic updates
 	const handleCheckboxChange = useCallback(
 		(exercise: ExerciseWithProgress, checked: boolean) => {
+			// Immediately update UI optimistically
+			setOptimisticUpdates((prev) => new Map(prev).set(exercise.id, checked));
+
 			if (checked) {
 				// Mark as complete - record progress with target reps for all sets
 				const completedReps = Array(exercise.targetSets).fill(
 					exercise.targetReps,
 				);
-				recordProgress.mutate({
-					sessionId,
-					exerciseId: exercise.id,
-					completedReps: JSON.stringify(completedReps),
-				});
+				recordProgress.mutate(
+					{
+						sessionId,
+						exerciseId: exercise.id,
+						completedReps: JSON.stringify(completedReps),
+					},
+					{
+						onError: (error) => {
+							// Rollback optimistic update on error
+							setOptimisticUpdates((prev) => {
+								const next = new Map(prev);
+								next.delete(exercise.id);
+								return next;
+							});
+							toast.error(error.message);
+						},
+						onSuccess: () => {
+							// Clear optimistic state on success (server data will take over)
+							setOptimisticUpdates((prev) => {
+								const next = new Map(prev);
+								next.delete(exercise.id);
+								return next;
+							});
+						},
+					},
+				);
 			} else {
 				// Mark as incomplete - delete progress
 				if (exercise.progress) {
-					deleteProgress.mutate({
-						id: exercise.progress.id,
+					deleteProgress.mutate(
+						{
+							id: exercise.progress.id,
+						},
+						{
+							onError: (error) => {
+								// Rollback optimistic update on error
+								setOptimisticUpdates((prev) => {
+									const next = new Map(prev);
+									next.delete(exercise.id);
+									return next;
+								});
+								toast.error(error.message);
+							},
+							onSuccess: () => {
+								// Clear optimistic state on success
+								setOptimisticUpdates((prev) => {
+									const next = new Map(prev);
+									next.delete(exercise.id);
+									return next;
+								});
+							},
+						},
+					);
+				} else {
+					// No progress record to delete, just clear optimistic state
+					setOptimisticUpdates((prev) => {
+						const next = new Map(prev);
+						next.delete(exercise.id);
+						return next;
 					});
 				}
 			}
@@ -236,6 +287,7 @@ export function ExerciseChecklist({
 								exercise.isCompleted
 									? "border-green-500/30 bg-green-500/5"
 									: "border-border bg-card",
+								exercise.isOptimistic && "animate-pulse",
 							)}
 						>
 							{/* Checkbox or Progress Input Button */}

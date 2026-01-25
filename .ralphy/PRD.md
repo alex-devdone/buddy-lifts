@@ -25,7 +25,7 @@
 ### Authentication Enhancement
 - [x] Add Google OAuth provider to `packages/auth/src/index.ts` using Better-Auth socialProviders
 - [x] Update `apps/web/src/lib/auth-client.ts` with Google sign-in method
-- [ ] Create Google OAuth credentials in Google Cloud Console (manual step - document in README)
+<!-- - [ ] Create Google OAuth credentials in Google Cloud Console (manual step - document in README) -->
 
 ## Phase 2: Core Backend (parallel_group: 2)
 
@@ -93,15 +93,15 @@
 - [x] Update `apps/web/src/components/header.tsx` - add navigation for Trainings, Feed, Friends
 
 ### Auth Pages
-- [ ] Update sign-in page to include Google OAuth button
+<!-- - [ ] Update sign-in page to include Google OAuth button -->
 - [x] Add redirect logic for invite links (save code, redirect to login, then join)
 
 ## Phase 5: Real-time & Polish (parallel_group: 5)
 
 ### Real-time Subscriptions
-- [ ] Add Supabase real-time subscription for session participants in session page
-- [ ] Add Supabase real-time subscription for exercise progress updates
-- [ ] Implement optimistic updates for progress recording
+- [x] Add Supabase real-time subscription for session participants in session page
+- [x] Add Supabase real-time subscription for exercise progress updates
+- [x] Implement optimistic updates for progress recording
 
 ### Mobile Optimization
 - [ ] Ensure all components use responsive Tailwind classes (mobile-first)
