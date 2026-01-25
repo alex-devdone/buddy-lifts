@@ -17,18 +17,144 @@
  */
 
 import { describe, expect, it, vi } from "vitest";
-import { ProgressInput } from "../progress-input";
+
+// Mock the env package before any imports
+vi.mock("@buddy-lifts/env/web", () => ({
+	env: {
+		NEXT_PUBLIC_SUPABASE_URL: "https://test.supabase.co",
+		NEXT_PUBLIC_SUPABASE_ANON_KEY: "test-anon-key",
+	},
+}));
+
+import { parseRepsInput } from "../progress-input";
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+	process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
+}
+
+describe("parseRepsInput", () => {
+	describe("Fraction Format Input (e.g., '8/10')", () => {
+		it("should parse '8/10' as 8 actual reps with 10 target reps", () => {
+			const result = parseRepsInput("8/10");
+			expect(result.actualReps).toBe(8);
+			expect(result.targetReps).toBe(10);
+		});
+
+		it("should parse '5/8' as 5 actual reps with 8 target reps", () => {
+			const result = parseRepsInput("5/8");
+			expect(result.actualReps).toBe(5);
+			expect(result.targetReps).toBe(8);
+		});
+
+		it("should parse '0/10' as 0 actual reps with 10 target reps", () => {
+			const result = parseRepsInput("0/10");
+			expect(result.actualReps).toBe(0);
+			expect(result.targetReps).toBe(10);
+		});
+
+		it("should handle spaces around the slash", () => {
+			const result1 = parseRepsInput("8 / 10");
+			expect(result1.actualReps).toBe(8);
+			expect(result1.targetReps).toBe(10);
+
+			const result2 = parseRepsInput("8/ 10");
+			expect(result2.actualReps).toBe(8);
+			expect(result2.targetReps).toBe(10);
+
+			const result3 = parseRepsInput("8 /10");
+			expect(result3.actualReps).toBe(8);
+			expect(result3.targetReps).toBe(10);
+		});
+
+		it("should return null for targetReps when denominator is 0 or negative", () => {
+			const result1 = parseRepsInput("8/0");
+			expect(result1.actualReps).toBe(8);
+			expect(result1.targetReps).toBeNull();
+
+			const result2 = parseRepsInput("8/-5");
+			expect(result2.actualReps).toBe(8);
+			expect(result2.targetReps).toBeNull();
+		});
+
+		it("should handle large numbers in fraction format", () => {
+			const result = parseRepsInput("15/20");
+			expect(result.actualReps).toBe(15);
+			expect(result.targetReps).toBe(20);
+		});
+	});
+
+	describe("Simple Number Input (e.g., '8')", () => {
+		it("should parse '8' as 8 actual reps with null target reps", () => {
+			const result = parseRepsInput("8");
+			expect(result.actualReps).toBe(8);
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should parse '0' as 0 actual reps with null target reps", () => {
+			const result = parseRepsInput("0");
+			expect(result.actualReps).toBe(0);
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should parse '10' as 10 actual reps with null target reps", () => {
+			const result = parseRepsInput("10");
+			expect(result.actualReps).toBe(10);
+			expect(result.targetReps).toBeNull();
+		});
+	});
+
+	describe("Edge Cases and Invalid Input", () => {
+		it("should return 0 actualReps and null targetReps for empty string", () => {
+			const result = parseRepsInput("");
+			expect(result.actualReps).toBe(0);
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should return 0 actualReps and null targetReps for whitespace only", () => {
+			const result = parseRepsInput("   ");
+			expect(result.actualReps).toBe(0);
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should handle invalid numbers in fraction format", () => {
+			const result = parseRepsInput("abc/10");
+			expect(result.actualReps).toBe(0);
+			// When numerator is NaN, actualReps is 0
+			// When denominator is valid number but numerator is not, targetReps is still parsed
+			// However, the current implementation returns null for targetReps when numerator is NaN
+			// Let's test the actual behavior
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should return 0 for invalid simple number input", () => {
+			const result = parseRepsInput("abc");
+			expect(result.actualReps).toBe(0);
+			expect(result.targetReps).toBeNull();
+		});
+
+		it("should trim whitespace before parsing", () => {
+			const result = parseRepsInput("  8/10  ");
+			expect(result.actualReps).toBe(8);
+			expect(result.targetReps).toBe(10);
+		});
+	});
+});
 
 describe("ProgressInput Component", () => {
 	describe("Component Structure", () => {
-		it("should be a named function component exported from its file", () => {
-			expect(ProgressInput).toBeTypeOf("function");
-			expect(ProgressInput.name).toBe("ProgressInput");
+		it("should be a named function component exported from its file", async () => {
+			const module = await import("../progress-input");
+			expect(module.ProgressInput).toBeTypeOf("function");
+			expect(module.ProgressInput.name).toBe("ProgressInput");
 		});
 
-		it("should be defined in a file matching its name", () => {
+		it("should be defined in a file matching its name", async () => {
 			// File path: apps/web/src/components/session/progress-input.tsx
-			expect(ProgressInput).toBeDefined();
+			const module = await import("../progress-input");
+			expect(module.ProgressInput).toBeDefined();
 		});
 	});
 
@@ -172,6 +298,19 @@ describe("ProgressInput Component", () => {
 			expect(isInitialized).toBe(true);
 		});
 
+		it("should reset initialization when switching exercises or trainings", () => {
+			const fs = require("node:fs");
+			const path = require("node:path");
+			const content = fs.readFileSync(
+				path.join(__dirname, "../progress-input.tsx"),
+				"utf-8",
+			);
+			expect(content).toContain("useEffect");
+			expect(content).toContain("setIsInitialized(false)");
+			expect(content).toContain("setSetInputs([])");
+			expect(content).toContain("[exerciseId, trainingId]");
+		});
+
 		it("should update individual set inputs on change", () => {
 			// handleSetInputChange updates specific set input
 			const setNumber = 2;
@@ -303,6 +442,111 @@ describe("ProgressInput Component", () => {
 				(totalCompletedReps / totalTargetReps) * 100,
 			); // 93
 			expect(percentage).toBe(93);
+		});
+
+		it("should calculate percentage with fraction format inputs (e.g., '8/10')", () => {
+			// Example: 3 sets with fraction inputs
+			// Set 1: "8/10" = 8 actual, 10 target
+			// Set 2: "10/12" = 10 actual, 12 target
+			// Set 3: "9/10" = 9 actual, 10 target
+			// Total: 27 actual / 32 target = 84%
+			const inputs = ["8/10", "10/12", "9/10"];
+			const totalCompletedReps = inputs.reduce((sum, input) => {
+				const { actualReps } = parseRepsInput(input);
+				return sum + actualReps;
+			}, 0); // 27
+
+			const totalTargetReps = inputs.reduce((sum, input) => {
+				const { targetReps } = parseRepsInput(input);
+				return sum + (targetReps ?? 0);
+			}, 0); // 32
+
+			const percentage = Math.round(
+				(totalCompletedReps / totalTargetReps) * 100,
+			); // 84
+
+			expect(totalCompletedReps).toBe(27);
+			expect(totalTargetReps).toBe(32);
+			expect(percentage).toBe(84);
+		});
+
+		it("should calculate percentage with mixed fraction and simple inputs", () => {
+			// Example: 3 sets with mixed inputs
+			// Set 1: "8/10" = 8 actual, 10 target (fraction)
+			// Set 2: "10" = 10 actual, null target (simple, uses exercise target of 10)
+			// Set 3: "9" = 9 actual, null target (simple, uses exercise target of 10)
+			// Total: 27 actual / 30 target = 90%
+			const inputs = ["8/10", "10", "9"];
+			const exerciseTargetReps = 10;
+
+			const totalCompletedReps = inputs.reduce((sum, input) => {
+				const { actualReps } = parseRepsInput(input);
+				return sum + actualReps;
+			}, 0); // 27
+
+			const totalTargetReps = inputs.reduce((sum, input) => {
+				const { targetReps } = parseRepsInput(input);
+				return sum + (targetReps ?? exerciseTargetReps);
+			}, 0); // 10 + 10 + 10 = 30
+
+			const percentage = Math.round(
+				(totalCompletedReps / totalTargetReps) * 100,
+			); // 90
+
+			expect(totalCompletedReps).toBe(27);
+			expect(totalTargetReps).toBe(30);
+			expect(percentage).toBe(90);
+		});
+
+		it("should handle partial completion with fraction inputs", () => {
+			// Example: User did fewer reps than their personal target
+			// Set 1: "5/10" = 5 actual, 10 target (50%)
+			// Set 2: "6/10" = 6 actual, 10 target (60%)
+			// Set 3: "7/10" = 7 actual, 10 target (70%)
+			// Total: 18 actual / 30 target = 60%
+			const inputs = ["5/10", "6/10", "7/10"];
+
+			const totalCompletedReps = inputs.reduce((sum, input) => {
+				const { actualReps } = parseRepsInput(input);
+				return sum + actualReps;
+			}, 0); // 18
+
+			const totalTargetReps = inputs.reduce((sum, input) => {
+				const { targetReps } = parseRepsInput(input);
+				return sum + (targetReps ?? 0);
+			}, 0); // 30
+
+			const percentage = Math.round(
+				(totalCompletedReps / totalTargetReps) * 100,
+			); // 60
+
+			expect(percentage).toBe(60);
+		});
+
+		it("should handle exceeding personal targets with fraction inputs", () => {
+			// Example: User did more reps than their personal target
+			// Set 1: "12/10" = 12 actual, 10 target (120%)
+			// Set 2: "11/10" = 11 actual, 10 target (110%)
+			// Set 3: "13/10" = 13 actual, 10 target (130%)
+			// Total: 36 actual / 30 target = 120% (capped at 100%)
+			const inputs = ["12/10", "11/10", "13/10"];
+
+			const totalCompletedReps = inputs.reduce((sum, input) => {
+				const { actualReps } = parseRepsInput(input);
+				return sum + actualReps;
+			}, 0); // 36
+
+			const totalTargetReps = inputs.reduce((sum, input) => {
+				const { targetReps } = parseRepsInput(input);
+				return sum + (targetReps ?? 0);
+			}, 0); // 30
+
+			const rawPercentage = (totalCompletedReps / totalTargetReps) * 100; // 120
+			const percentage = Math.min(Math.round(rawPercentage), 100); // 100
+
+			expect(totalCompletedReps).toBe(36);
+			expect(totalTargetReps).toBe(30);
+			expect(percentage).toBe(100);
 		});
 
 		it("should cap percentage at 100%", () => {

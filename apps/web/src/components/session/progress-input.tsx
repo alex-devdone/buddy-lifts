@@ -1,7 +1,8 @@
 "use client";
 
+import { useMutation } from "@tanstack/react-query";
 import { Check, Loader2, Plus, X } from "lucide-react";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +48,37 @@ interface SetInput {
 	actualReps: string;
 }
 
+interface ParsedRepsInput {
+	actualReps: number;
+	targetReps: number | null;
+}
+
+export const parseRepsInput = (value: string): ParsedRepsInput => {
+	const trimmed = value.trim();
+	if (!trimmed) {
+		return { actualReps: 0, targetReps: null };
+	}
+
+	const fractionMatch = trimmed.match(/^(\d+)\s*\/\s*(\d+)$/);
+	if (fractionMatch) {
+		const numerator = Number.parseInt(fractionMatch[1], 10);
+		const denominator = Number.parseInt(fractionMatch[2], 10);
+		const actualReps = Number.isNaN(numerator) ? 0 : numerator;
+		const targetReps =
+			Number.isNaN(denominator) || denominator <= 0 ? null : denominator;
+		return { actualReps, targetReps };
+	}
+
+	const actualReps = Number.parseInt(trimmed, 10);
+
+	return {
+		actualReps: Number.isNaN(actualReps) ? 0 : actualReps,
+		targetReps: null,
+	};
+};
+
+export type { ParsedRepsInput };
+
 /**
  * ProgressInput Component
  *
@@ -74,17 +106,17 @@ export function ProgressInput({
 	showCompletedState = false,
 }: ProgressInputProps) {
 	// Fetch exercise details using Supabase (read)
-	const { data: exercise, isLoading: exerciseLoading } =
+	const { data: exercises, isLoading: exerciseLoading } =
 		useSupabaseQuery<Exercise>({
 			queryFn: (supabase) =>
-				supabase.from("exercise").select("*").eq("id", exerciseId).single(),
+				supabase.from("exercise").select("*").eq("id", exerciseId),
 			realtime: true,
 			table: "exercise",
 		});
 
 	// Fetch existing progress using Supabase (read)
 	const { data: existingProgress, isLoading: progressLoading } =
-		useSupabaseQuery<ExerciseProgress[]>({
+		useSupabaseQuery<ExerciseProgress>({
 			queryFn: (supabase) =>
 				supabase
 					.from("exercise_progress")
@@ -126,6 +158,15 @@ export function ProgressInput({
 	// Initialize inputs when exercise data loads
 	const [isInitialized, setIsInitialized] = useState(false);
 
+	// Reset state when switching exercises or trainings
+	useEffect(() => {
+		if (!exerciseId || !trainingId) {
+			return;
+		}
+		setIsInitialized(false);
+		setSetInputs([]);
+	}, [exerciseId, trainingId]);
+
 	// Memoized check for existing progress
 	const hasExistingProgress = useMemo(() => {
 		return (
@@ -134,6 +175,8 @@ export function ProgressInput({
 			existingProgress[0]?.completedAt !== null
 		);
 	}, [existingProgress]);
+
+	const exercise = exercises?.[0];
 
 	// Initialize set inputs when exercise loads
 	if (exercise && !isInitialized && !exerciseLoading) {
@@ -147,26 +190,30 @@ export function ProgressInput({
 	}
 
 	// tRPC mutation for recording exercise progress
-	const recordProgress = trpc.progress.record.useMutation({
-		onSuccess: () => {
-			toast.success("Progress saved successfully!");
-			onComplete?.();
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
+	const recordProgress = useMutation(
+		trpc.progress.record.mutationOptions({
+			onSuccess: () => {
+				toast.success("Progress saved successfully!");
+				onComplete?.();
+			},
+			onError: (error: { message: string }) => {
+				toast.error(error.message);
+			},
+		}),
+	);
 
 	// tRPC mutation for updating exercise progress
-	const updateProgress = trpc.progress.update.useMutation({
-		onSuccess: () => {
-			toast.success("Progress updated successfully!");
-			onComplete?.();
-		},
-		onError: (error) => {
-			toast.error(error.message);
-		},
-	});
+	const updateProgress = useMutation(
+		trpc.progress.update.mutationOptions({
+			onSuccess: () => {
+				toast.success("Progress updated successfully!");
+				onComplete?.();
+			},
+			onError: (error: { message: string }) => {
+				toast.error(error.message);
+			},
+		}),
+	);
 
 	// Calculate completion percentage
 	const { completionPercentage, totalCompletedReps, totalTargetReps } =
@@ -179,10 +226,14 @@ export function ProgressInput({
 				};
 			}
 
-			const totalTarget = exercise.targetSets * exercise.targetReps;
 			const completed = setInputs.reduce((sum, set) => {
-				const reps = Number.parseInt(set.actualReps, 10);
-				return sum + (Number.isNaN(reps) ? 0 : reps);
+				const { actualReps } = parseRepsInput(set.actualReps);
+				return sum + actualReps;
+			}, 0);
+
+			const totalTarget = setInputs.reduce((sum, set) => {
+				const { targetReps } = parseRepsInput(set.actualReps);
+				return sum + (targetReps ?? set.targetReps);
 			}, 0);
 
 			const percentage =
@@ -234,8 +285,8 @@ export function ProgressInput({
 		if (!exercise) return;
 
 		const completedReps = setInputs.map((set) => {
-			const reps = Number.parseInt(set.actualReps, 10);
-			return Number.isNaN(reps) ? 0 : reps;
+			const { actualReps } = parseRepsInput(set.actualReps);
+			return actualReps;
 		});
 
 		// Validate at least one set has input
@@ -361,11 +412,9 @@ export function ProgressInput({
 
 								<div className="flex flex-1 items-center gap-2">
 									<Input
-										type="number"
-										inputMode="numeric"
-										placeholder="0"
-										min="0"
-										max={set.targetReps * 2}
+										type="text"
+										inputMode="text"
+										placeholder="0 or 8/10"
 										value={set.actualReps}
 										onChange={(e) =>
 											handleSetInputChange(set.setNumber, e.target.value)
