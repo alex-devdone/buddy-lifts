@@ -337,7 +337,7 @@ describe("SessionLobby Component", () => {
 	});
 
 	test("should have proper TypeScript interfaces", async () => {
-		const module = await import("../session-lobby");
+		await import("../session-lobby");
 		const fileContent = await import("node:fs").then((fs) =>
 			fs.readFileSync(`${__dirname}/../session-lobby.tsx`, "utf-8"),
 		);

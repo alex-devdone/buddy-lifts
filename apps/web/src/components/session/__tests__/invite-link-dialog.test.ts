@@ -279,7 +279,7 @@ describe("InviteLinkDialog Component", () => {
 	});
 
 	test("should have proper TypeScript interfaces", async () => {
-		const module = await import("../invite-link-dialog");
+		await import("../invite-link-dialog");
 		const fileContent = await import("node:fs").then((fs) =>
 			fs.readFileSync(`${__dirname}/../invite-link-dialog.tsx`, "utf-8"),
 		);

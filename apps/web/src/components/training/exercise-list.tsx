@@ -40,11 +40,6 @@ interface ExerciseListProps {
 	onEditExercise?: (exercise: Exercise) => void;
 }
 
-type DragItem = {
-	index: number;
-	id: string;
-};
-
 export function ExerciseList({
 	trainingId,
 	currentUserId,
@@ -57,11 +52,7 @@ export function ExerciseList({
 	const isOwner = currentUserId === trainingUserId;
 
 	// Fetch exercises using Supabase (read)
-	const {
-		data: exercises = [],
-		isLoading,
-		refetch,
-	} = useSupabaseQuery<Exercise>({
+	const { data: exercises = [], isLoading } = useSupabaseQuery<Exercise>({
 		queryFn: (supabase) =>
 			supabase
 				.from("exercise")
@@ -141,7 +132,7 @@ export function ExerciseList({
 		try {
 			await Promise.all(updates);
 			toast.success("Exercises reordered");
-		} catch (error) {
+		} catch (_error) {
 			toast.error("Failed to reorder exercises");
 		}
 
@@ -169,7 +160,7 @@ export function ExerciseList({
 
 			try {
 				await Promise.all(updates);
-			} catch (error) {
+			} catch (_error) {
 				toast.error("Failed to move exercise");
 			}
 		},
@@ -196,7 +187,7 @@ export function ExerciseList({
 
 			try {
 				await Promise.all(updates);
-			} catch (error) {
+			} catch (_error) {
 				toast.error("Failed to move exercise");
 			}
 		},

@@ -81,7 +81,9 @@ describe("ExerciseList Component", () => {
 				trainingId: "training-1",
 				currentUserId: "user-1" as string | undefined,
 				trainingUserId: "user-1" as string | undefined,
-				onEditExercise: undefined as ((exercise: any) => void) | undefined,
+				onEditExercise: undefined as
+					| ((exercise: { id: string }) => void)
+					| undefined,
 			};
 
 			expect(props.trainingId).toBe("training-1");
@@ -105,7 +107,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Data Access Pattern", () => {
 		it("should use Supabase for reading exercises", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -114,7 +116,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should use tRPC for mutations", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -126,7 +128,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Component Features", () => {
 		it("should support drag and drop reordering", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -138,7 +140,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should support move up/down buttons", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -148,7 +150,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should support edit and delete actions", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -158,7 +160,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should show loading skeleton while fetching", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -168,7 +170,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should show empty state when no exercises", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -180,7 +182,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Accessibility", () => {
 		it("should have proper ARIA labels for action buttons", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -191,7 +193,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should have screen reader text", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -202,7 +204,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Responsive Design", () => {
 		it("should use mobile-first responsive classes", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -212,7 +214,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should have truncation for long text", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -223,7 +225,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Business Logic", () => {
 		it("should identify ownership based on user IDs", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -233,7 +235,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should show actions only for owner", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -242,7 +244,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should disable move up button for first exercise", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -251,7 +253,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should disable move down button for last exercise", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -262,7 +264,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Real-time Updates", () => {
 		it("should enable real-time for Supabase query", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -274,7 +276,7 @@ describe("ExerciseList Component", () => {
 
 	describe("Error Handling", () => {
 		it("should handle update errors with toast", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -284,7 +286,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should handle delete errors with toast", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
@@ -294,7 +296,7 @@ describe("ExerciseList Component", () => {
 		});
 
 		it("should confirm before deleting", () => {
-			const fs = require("fs");
+			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../exercise-list.tsx`,
 				"utf-8",
