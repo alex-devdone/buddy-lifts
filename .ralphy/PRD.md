@@ -70,7 +70,7 @@
 ### Friend Management
 - [x] Create `apps/web/src/components/friends/friend-list.tsx` - list with remove action
 - [x] Create `apps/web/src/components/friends/friend-request-card.tsx` - accept/reject UI
-- [ ] Create `apps/web/src/components/friends/add-friend-dialog.tsx` - search and send request
+- [x] Create `apps/web/src/components/friends/add-friend-dialog.tsx` - search and send request
 
 ### Feed & History
 - [ ] Create `apps/web/src/components/feed/training-feed.tsx` - upcoming and past trainings (yours + friends)
