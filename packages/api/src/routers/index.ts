@@ -1,4 +1,5 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
+import { aiSummaryRouter } from "./ai-summary";
 import { exerciseRouter } from "./exercise";
 import { exerciseParserRouter } from "./exercise-parser";
 import { friendRouter } from "./friend";
@@ -24,5 +25,6 @@ export const appRouter = router({
 	session: sessionRouter,
 	progress: progressRouter,
 	friend: friendRouter,
+	aiSummary: aiSummaryRouter,
 });
 export type AppRouter = typeof appRouter;
