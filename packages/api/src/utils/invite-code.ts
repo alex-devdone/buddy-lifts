@@ -14,10 +14,18 @@ import { customAlphabet } from "nanoid";
 const ALPHABET = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
 
 /**
+ * Invite code type alias for type safety
+ */
+export type InviteCode = string;
+
+/**
  * Generate a unique 8-character invite code
  * Provides ~2.8 trillion possible combinations (36^8)
  */
-export const generateInviteCode = customAlphabet(ALPHABET, 8);
+export const generateInviteCode = customAlphabet(
+	ALPHABET,
+	8,
+) as () => InviteCode;
 
 /**
  * Validate an invite code format

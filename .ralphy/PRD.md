@@ -117,8 +117,8 @@
 
 ## Phase 6: Testing & QA (parallel_group: 6)
 
-- [ ] Write unit tests for exercise parser in `packages/api/src/routers/__tests__/exercise-parser.test.ts`
-- [ ] Write unit tests for invite code generation
+- [x] Write unit tests for exercise parser in `packages/api/src/routers/__tests__/exercise-parser.test.ts`
+- [x] Write unit tests for invite code generation
 - [ ] Write integration tests for session flow
 - [ ] Run `bun run check` and fix linting issues
 - [ ] Run `bun run check-types` and fix type errors
