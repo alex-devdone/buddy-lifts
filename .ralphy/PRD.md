@@ -44,9 +44,9 @@
 - [x] Add invite validation and expiry logic in session router
 
 ### Email Notifications (Supabase Edge Functions)
-- [ ] Create Supabase Edge Function `supabase/functions/notify-join/index.ts` - email when someone joins training
-- [ ] Create Supabase Edge Function `supabase/functions/notify-complete/index.ts` - email with progress summary on completion
-- [ ] Set up database triggers in Supabase to invoke edge functions
+- [x] Create Supabase Edge Function `supabase/functions/notify-join/index.ts` - email when someone joins training
+- [x] Create Supabase Edge Function `supabase/functions/notify-complete/index.ts` - email with progress summary on completion
+- [x] Set up database triggers in Supabase to invoke edge functions
 
 ## Phase 3: UI Components (parallel_group: 3)
 
