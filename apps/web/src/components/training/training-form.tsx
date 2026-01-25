@@ -39,7 +39,7 @@ export function TrainingForm({
 				toast.success("Training created successfully");
 				onSuccess?.(data as Training);
 				if (!onSuccess) {
-					router.push(`/trainings/${data.id}` as `/trainings/${string}`);
+					router.push(`/trainings/${data.id}` as any);
 				}
 			},
 			onError: (error) => {
