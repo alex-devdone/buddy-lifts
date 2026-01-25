@@ -84,7 +84,7 @@
 
 ### App Pages
 - [x] Create `apps/web/src/app/trainings/page.tsx` - list all trainings with create button
-- [ ] Create `apps/web/src/app/trainings/new/page.tsx` - create new training
+- [x] Create `apps/web/src/app/trainings/new/page.tsx` - create new training
 - [ ] Create `apps/web/src/app/trainings/[id]/page.tsx` - training detail/edit
 - [ ] Create `apps/web/src/app/trainings/[id]/session/page.tsx` - active training session with live progress
 - [ ] Create `apps/web/src/app/join/[code]/page.tsx` - invite link handler (auth required, then join)
