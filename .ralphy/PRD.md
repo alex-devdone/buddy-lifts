@@ -57,7 +57,7 @@
 - [x] Create `apps/web/src/components/training/exercise-list.tsx` - sortable exercise list with drag-drop
 
 ### Session Components
-- [ ] Create `apps/web/src/components/session/session-lobby.tsx` - waiting room before starting
+- [x] Create `apps/web/src/components/session/session-lobby.tsx` - waiting room before starting
 - [ ] Create `apps/web/src/components/session/invite-link-dialog.tsx` - generate/copy invite link with access level
 - [ ] Create `apps/web/src/components/session/participant-grid.tsx` - grid layout for 1-3 participants (mobile responsive)
 
