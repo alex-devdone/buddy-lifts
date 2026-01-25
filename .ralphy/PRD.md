@@ -89,7 +89,7 @@
 - [x] Create `apps/web/src/app/trainings/[id]/session/page.tsx` - active training session with live progress
 - [x] Create `apps/web/src/app/join/[code]/page.tsx` - invite link handler (auth required, then join)
 - [x] Create `apps/web/src/app/friends/page.tsx` - friend list and requests
-- [ ] Create `apps/web/src/app/feed/page.tsx` - training feed (your + friends' trainings)
+- [x] Create `apps/web/src/app/feed/page.tsx` - training feed (your + friends' trainings)
 - [ ] Update `apps/web/src/components/header.tsx` - add navigation for Trainings, Feed, Friends
 
 ### Auth Pages
