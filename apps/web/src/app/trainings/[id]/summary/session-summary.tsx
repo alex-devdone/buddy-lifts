@@ -14,7 +14,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 import { trpc } from "@/utils/trpc";
@@ -79,7 +79,7 @@ export function SessionSummary({
 		data: aiSummary,
 		isLoading: aiSummaryLoading,
 		error: aiSummaryError,
-	} = trpc.aiSummary.generate.useQuery(
+	} = (trpc as any).aiSummary.generate.useQuery(
 		{ sessionId },
 		{
 			enabled: !!sessionId && sessionData?.[0]?.status === "completed",
@@ -199,13 +199,15 @@ export function SessionSummary({
 	}
 
 	const avgCompletion =
-		aiSummary.participants.reduce((sum, p) => sum + p.overallCompletion, 0) /
-		aiSummary.participants.length;
+		aiSummary.participants.reduce(
+			(sum: number, p: any) => sum + p.overallCompletion,
+			0,
+		) / aiSummary.participants.length;
 
 	const currentUserRanking = aiSummary.comparisons.find(
-		(c) => c.userId === currentUserId,
+		(c: any) => c.userId === currentUserId,
 	);
-	const winners = aiSummary.comparisons.filter((c) => c.isWinner);
+	const winners = aiSummary.comparisons.filter((c: any) => c.isWinner);
 
 	// Get rank badge component
 	const getRankBadge = (index: number): React.ReactNode => {
@@ -274,7 +276,7 @@ export function SessionSummary({
 						</div>
 						<p className="font-bold text-2xl">
 							{aiSummary.participants.reduce(
-								(sum, p) => sum + p.totalCompletedReps,
+								(sum: number, p: any) => sum + p.totalCompletedReps,
 								0,
 							)}
 						</p>
@@ -295,7 +297,7 @@ export function SessionSummary({
 					</CardHeader>
 					<CardContent>
 						<div className="flex flex-wrap gap-2">
-							{winners.map((winner) => (
+							{winners.map((winner: any) => (
 								<Badge
 									key={winner.userId}
 									variant="success"
@@ -320,7 +322,7 @@ export function SessionSummary({
 							>
 								{getRankBadge(
 									aiSummary.comparisons.findIndex(
-										(c) => c.userId === currentUserId,
+										(c: any) => c.userId === currentUserId,
 									),
 								)}
 							</Badge>
@@ -367,7 +369,7 @@ export function SessionSummary({
 
 				{/* Rankings Tab */}
 				<TabsContent value="overview" className="space-y-3">
-					{aiSummary.comparisons.map((comparison, index) => {
+					{aiSummary.comparisons.map((comparison: any, index: number) => {
 						const isCurrentUser = comparison.userId === currentUserId;
 
 						return (
@@ -427,7 +429,7 @@ export function SessionSummary({
 					<div className="space-y-2">
 						<h3 className="font-semibold text-sm">Session Highlights</h3>
 						<div className="space-y-2">
-							{aiSummary.insights.map((insight) => (
+							{aiSummary.insights.map((insight: string) => (
 								<Card key={`insight-${insight.slice(0, 20)}`}>
 									<CardContent className="py-3">
 										<p className="text-sm">{insight}</p>
@@ -442,7 +444,7 @@ export function SessionSummary({
 						<div className="space-y-2">
 							<h3 className="font-semibold text-sm">Performance Highlights</h3>
 							<div className="space-y-2">
-								{aiSummary.highlights.map((highlight) => (
+								{aiSummary.highlights.map((highlight: string) => (
 									<Card key={`highlight-${highlight.slice(0, 20)}`}>
 										<CardContent className="py-3">
 											<p className="whitespace-pre-wrap text-sm">{highlight}</p>

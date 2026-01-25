@@ -10,6 +10,7 @@
 		}
 	},
 	"scripts": {
+		"check-types": "tsc -p tsconfig.json --noEmit",
 		"test": "bun test"
 	},
 	"dependencies": {
@@ -26,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@buddy-lifts/config": "workspace:*",
+		"@types/bun": "latest",
 		"typescript": "catalog:"
 	}
 }
