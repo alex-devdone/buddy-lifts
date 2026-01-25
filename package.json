@@ -48,11 +48,16 @@
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.0",
 		"@buddy-lifts/config": "workspace:*",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^22.13.14",
+		"happy-dom": "^20.3.7",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.1.2",
 		"turbo": "^2.6.3",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "^4.0.18"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [
