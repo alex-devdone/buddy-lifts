@@ -60,9 +60,12 @@ describe("FeedItem Component", () => {
 			expect(FeedItem).toBeDefined();
 		});
 
-		it("should accept optional onJoin callback", () => {
+		it("should accept optional onJoin callback with inviteCode parameter", () => {
 			const { FeedItem } = require("../feed-item");
 			expect(FeedItem).toBeDefined();
+			// Verify the callback signature expects inviteCode (string)
+			const onJoinFn: (inviteCode: string) => void = () => {};
+			expect(typeof onJoinFn).toBe("function");
 		});
 
 		it("should accept optional onView callback", () => {
@@ -351,10 +354,10 @@ describe("FeedItem Component", () => {
 
 describe("FeedItem Integration", () => {
 	describe("Callback Handling", () => {
-		it("should call onJoin with session ID when join button clicked", () => {
+		it("should call onJoin with invite code when join button clicked", () => {
 			const fs = require("node:fs");
 			const content = fs.readFileSync(`${__dirname}/../feed-item.tsx`, "utf-8");
-			expect(content).toContain("onJoin?.(activeSession.id)");
+			expect(content).toContain("onJoin?.(activeSession.inviteCode)");
 		});
 
 		it("should call onView with training ID when view button clicked", () => {

@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 
-interface TrainingFeedItem {
+export interface TrainingFeedItem {
 	id: string;
 	name: string;
 	description: string | null;
@@ -20,10 +20,10 @@ interface TrainingFeedItem {
 	sessionStatus?: "pending" | "active" | "completed" | null;
 }
 
-interface FeedItemProps {
+export interface FeedItemProps {
 	item: TrainingFeedItem;
 	currentUserId?: string;
-	onJoin?: (sessionId: string) => void;
+	onJoin?: (inviteCode: string) => void;
 	onView?: (trainingId: string) => void;
 }
 
@@ -147,7 +147,7 @@ export function FeedItem({
 										variant="outline"
 										size="sm"
 										className="w-full"
-										onClick={() => onJoin?.(activeSession.id)}
+										onClick={() => onJoin?.(activeSession.inviteCode)}
 									>
 										Join Session
 									</Button>

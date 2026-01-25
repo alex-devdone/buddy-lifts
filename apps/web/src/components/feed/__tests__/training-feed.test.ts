@@ -147,7 +147,7 @@ describe("TrainingFeed Component", () => {
 				`${__dirname}/../training-feed.tsx`,
 				"utf-8",
 			);
-			expect(content).toContain("setJoiningSessionId(sessionId)");
+			expect(content).toContain("setJoiningSessionId(inviteCode)");
 			expect(content).toContain("setJoiningSessionId(null)");
 		});
 	});
@@ -171,6 +171,17 @@ describe("TrainingFeed Component", () => {
 			);
 			expect(content).toContain("userId.eq.");
 			expect(content).toContain("friendId.eq.");
+		});
+
+		it("should extract friend ID from both directions of friendship", () => {
+			const fs = require("node:fs");
+			const content = fs.readFileSync(
+				`${__dirname}/../training-feed.tsx`,
+				"utf-8",
+			);
+			expect(content).toContain(
+				"f.userId === currentUserId ? f.friendId : f.userId",
+			);
 		});
 
 		it("should only fetch accepted friendships", () => {
@@ -266,15 +277,15 @@ describe("TrainingFeed Component", () => {
 			expect(content).toContain("friendIds.length + 1");
 		});
 
-		it("should show loading state with Loader2 spinner", () => {
+		it("should show loading state with skeleton cards", () => {
 			const fs = require("node:fs");
 			const content = fs.readFileSync(
 				`${__dirname}/../training-feed.tsx`,
 				"utf-8",
 			);
-			expect(content).toContain("Loader2");
+			expect(content).toContain("FeedItemSkeleton");
 			expect(content).toContain("isLoadingTrainings");
-			expect(content).toContain("Loading trainings...");
+			expect(content).toContain("isLoadingFriends");
 		});
 
 		it("should show empty state when no friends", () => {

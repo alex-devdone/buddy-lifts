@@ -1,7 +1,7 @@
 "use client";
 
 import { isPast, isToday, isTomorrow, isYesterday } from "date-fns";
-import { Calendar, Loader2, Users } from "lucide-react";
+import { Calendar, Users } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -9,20 +9,27 @@ import { Card, CardContent } from "@/components/ui/card";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 import { trpc } from "@/utils/trpc";
 import { FeedItem } from "./feed-item";
+import { FeedItemSkeleton } from "./feed-item-skeleton";
 
-interface FeedTraining {
+export interface FeedTraining {
 	id: string;
 	name: string;
 	description: string | null;
 	userId: string;
-	userName: string;
-	userEmail: string;
-	userImage: string | null;
+	userName?: string;
+	userEmail?: string;
+	userImage?: string | null;
 	createdAt: string;
 	exerciseCount?: number;
+	user?: {
+		id: string;
+		name: string;
+		email: string;
+		image: string | null;
+	}[];
 }
 
-interface SessionInfo {
+export interface SessionInfo {
 	id: string;
 	trainingId: string;
 	status: "pending" | "active" | "completed";
@@ -47,21 +54,27 @@ export function TrainingFeed({
 	);
 
 	// Fetch current user's friends (accepted friendships)
+	// Need to fetch both userId->friendId and friendId->userId relationships
 	const { data: friends, isLoading: isLoadingFriends } = useSupabaseQuery<{
 		friendId: string;
+		userId: string;
 	}>({
 		queryFn: (supabase) =>
 			supabase
 				.from("friend")
-				.select("friendId")
-				.or(`userId.eq.${currentUserId},and.friendId.eq.${currentUserId}`)
+				.select("userId, friendId")
+				.or(`userId.eq.${currentUserId},friendId.eq.${currentUserId}`)
 				.eq("status", "accepted"),
 		realtime: true,
 		table: "friend",
 	});
 
-	// Fetch friend IDs for the query
-	const friendIds = friends?.map((f) => f.friendId) ?? [];
+	// Extract friend IDs from both directions of the friendship
+	// If current user is userId, friendId is the friend
+	// If current user is friendId, userId is the friend
+	const friendIds =
+		friends?.map((f) => (f.userId === currentUserId ? f.friendId : f.userId)) ??
+		[];
 	const userIdsToFetch = [currentUserId, ...friendIds];
 
 	// Fetch trainings from user and friends
@@ -109,7 +122,6 @@ export function TrainingFeed({
 	// Fetch exercise counts for each training
 	const { data: exercises } = useSupabaseQuery<{
 		trainingId: string;
-		count: number;
 	}>({
 		queryFn: (supabase) =>
 			supabase
@@ -130,12 +142,13 @@ export function TrainingFeed({
 	);
 
 	// Join session mutation
-	const joinSession = trpc.session.join.useMutation({
+	// biome-ignore lint/suspicious/noExplicitAny: tRPC type inference issue with useMutation
+	const joinSession = (trpc.session.join as any).useMutation({
 		onSuccess: () => {
 			toast.success("Joined session successfully");
 			setJoiningSessionId(null);
 		},
-		onError: (error) => {
+		onError: (error: { message: string }) => {
 			toast.error(error.message);
 			setJoiningSessionId(null);
 		},
@@ -147,9 +160,14 @@ export function TrainingFeed({
 		const latestSessionDate = trainingSession?.startedAt ?? training.createdAt;
 		const isCompleted = trainingSession?.status === "completed";
 		const isPastSession = isCompleted || isPast(new Date(latestSessionDate));
+		const userData = training.user?.[0]; // Supabase returns array
 
 		return {
 			...training,
+			// Flatten user properties for FeedItem compatibility with defaults
+			userName: userData?.name ?? training.userName ?? "Unknown User",
+			userEmail: userData?.email ?? training.userEmail ?? "",
+			userImage: userData?.image ?? training.userImage ?? null,
 			exerciseCount: exerciseCounts?.[training.id] ?? 0,
 			scheduledFor: trainingSession?.startedAt ?? null,
 			sessionStatus: trainingSession?.status ?? null,
@@ -188,9 +206,9 @@ export function TrainingFeed({
 		{} as Record<string, typeof feedItems>,
 	);
 
-	const handleJoin = async (sessionId: string) => {
-		setJoiningSessionId(sessionId);
-		joinSession.mutate({ inviteCode: "" }); // Will be handled differently in real implementation
+	const handleJoin = async (inviteCode: string) => {
+		setJoiningSessionId(inviteCode);
+		joinSession.mutate({ inviteCode });
 	};
 
 	const handleView = (trainingId: string) => {
@@ -229,13 +247,12 @@ export function TrainingFeed({
 				)}
 			</div>
 
-			{/* Loading State */}
+			{/* Loading State with Skeleton Cards */}
 			{(isLoadingTrainings || isLoadingFriends) && (
-				<div className="flex flex-col items-center justify-center py-12">
-					<Loader2 className="h-8 w-8 animate-spin text-primary" />
-					<p className="mt-2 text-muted-foreground text-sm">
-						Loading trainings...
-					</p>
+				<div className="space-y-3">
+					<FeedItemSkeleton />
+					<FeedItemSkeleton />
+					<FeedItemSkeleton />
 				</div>
 			)}
 
