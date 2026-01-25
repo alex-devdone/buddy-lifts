@@ -73,8 +73,8 @@
 - [x] Create `apps/web/src/components/friends/add-friend-dialog.tsx` - search and send request
 
 ### Feed & History
-- [ ] Create `apps/web/src/components/feed/training-feed.tsx` - upcoming and past trainings (yours + friends)
-- [ ] Create `apps/web/src/components/feed/feed-item.tsx` - training preview with join button for friends' trainings
+- [x] Create `apps/web/src/components/feed/training-feed.tsx` - upcoming and past trainings (yours + friends)
+- [x] Create `apps/web/src/components/feed/feed-item.tsx` - training preview with join button for friends' trainings
 
 ### AI Summary
 - [ ] Create `apps/web/src/components/summary/training-summary.tsx` - post-workout summary with AI analysis
