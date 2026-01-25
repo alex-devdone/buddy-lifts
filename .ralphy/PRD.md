@@ -87,14 +87,14 @@
 - [x] Create `apps/web/src/app/trainings/new/page.tsx` - create new training
 - [x] Create `apps/web/src/app/trainings/[id]/page.tsx` - training detail/edit
 - [x] Create `apps/web/src/app/trainings/[id]/session/page.tsx` - active training session with live progress
-- [ ] Create `apps/web/src/app/join/[code]/page.tsx` - invite link handler (auth required, then join)
+- [x] Create `apps/web/src/app/join/[code]/page.tsx` - invite link handler (auth required, then join)
 - [ ] Create `apps/web/src/app/friends/page.tsx` - friend list and requests
 - [ ] Create `apps/web/src/app/feed/page.tsx` - training feed (your + friends' trainings)
 - [ ] Update `apps/web/src/components/header.tsx` - add navigation for Trainings, Feed, Friends
 
 ### Auth Pages
 - [ ] Update sign-in page to include Google OAuth button
-- [ ] Add redirect logic for invite links (save code, redirect to login, then join)
+- [x] Add redirect logic for invite links (save code, redirect to login, then join)
 
 ## Phase 5: Real-time & Polish (parallel_group: 5)
 
