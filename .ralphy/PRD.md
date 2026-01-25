@@ -83,7 +83,7 @@
 ## Phase 4: Pages & Routing (parallel_group: 4)
 
 ### App Pages
-- [ ] Create `apps/web/src/app/trainings/page.tsx` - list all trainings with create button
+- [x] Create `apps/web/src/app/trainings/page.tsx` - list all trainings with create button
 - [ ] Create `apps/web/src/app/trainings/new/page.tsx` - create new training
 - [ ] Create `apps/web/src/app/trainings/[id]/page.tsx` - training detail/edit
 - [ ] Create `apps/web/src/app/trainings/[id]/session/page.tsx` - active training session with live progress
