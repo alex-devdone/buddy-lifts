@@ -61,7 +61,7 @@ interface SetInput {
  * - Clear all inputs
  * - Save progress via tRPC mutation
  * - Read existing progress and populate inputs
- * - Mobile-first responsive design
+ * - Mobile-first responsive design with touch-friendly controls (min 44px targets)
  * - Visual feedback for completed state
  */
 export function ProgressInput({
@@ -324,10 +324,12 @@ export function ProgressInput({
 		<Card className={className}>
 			<CardHeader className="px-4 pt-4 pb-3">
 				<div className="flex items-center justify-between">
-					<CardTitle className="font-medium">{exercise.name}</CardTitle>
+					<CardTitle className="font-semibold text-base">
+						{exercise.name}
+					</CardTitle>
 					<div
 						className={cn(
-							"rounded-full px-2.5 py-0.5 font-semibold text-xs",
+							"rounded-full px-3 py-1 font-bold text-sm",
 							completionPercentage === 100
 								? "bg-green-500 text-white"
 								: completionPercentage >= 50
@@ -339,20 +341,22 @@ export function ProgressInput({
 					</div>
 				</div>
 				{exercise.weight && (
-					<p className="text-muted-foreground text-xs">{exercise.weight} lbs</p>
+					<p className="text-muted-foreground text-sm">{exercise.weight} lbs</p>
 				)}
 			</CardHeader>
 
-			<CardContent className="px-4 pb-4">
+			<CardContent className="px-4 pt-2 pb-4">
 				<div className="flex flex-col gap-4">
 					{/* Set inputs */}
-					<div className="flex flex-col gap-2">
-						<Label className="text-xs">Sets</Label>
+					<div className="flex flex-col gap-3">
+						<Label className="text-sm">Sets</Label>
 						{setInputs.map((set) => (
 							<div key={set.setNumber} className="flex items-center gap-3">
-								<div className="flex w-16 shrink-0 items-center gap-1">
-									<span className="text-muted-foreground text-xs">Set</span>
-									<span className="font-medium text-sm">{set.setNumber}</span>
+								<div className="flex w-20 shrink-0 items-center gap-1">
+									<span className="text-muted-foreground text-sm">Set</span>
+									<span className="font-semibold text-base">
+										{set.setNumber}
+									</span>
 								</div>
 
 								<div className="flex flex-1 items-center gap-2">
@@ -370,14 +374,14 @@ export function ProgressInput({
 										disabled={
 											recordProgress.isPending || updateProgress.isPending
 										}
-										className="h-9"
+										className="h-11 touch-manipulation text-base"
 									/>
-									<span className="text-muted-foreground text-xs">
+									<span className="text-muted-foreground text-sm">
 										/ {set.targetReps}
 									</span>
 								</div>
 
-								<span className="text-muted-foreground text-xs">reps</span>
+								<span className="text-muted-foreground text-sm">reps</span>
 							</div>
 						))}
 					</div>
@@ -387,31 +391,29 @@ export function ProgressInput({
 						<Button
 							type="button"
 							variant="outline"
-							size="sm"
 							onClick={handleAutoFill}
 							disabled={
 								recordProgress.isPending ||
 								updateProgress.isPending ||
 								hasExistingProgress
 							}
-							className="h-8 gap-1 text-xs"
+							className="h-11 min-h-11 touch-manipulation gap-2 px-4 text-sm"
 						>
-							<Plus className="h-3 w-3" />
+							<Plus className="h-4 w-4" />
 							Fill All
 						</Button>
 						<Button
 							type="button"
 							variant="outline"
-							size="sm"
 							onClick={handleClear}
 							disabled={
 								recordProgress.isPending ||
 								updateProgress.isPending ||
 								hasExistingProgress
 							}
-							className="h-8 gap-1 text-xs"
+							className="h-11 min-h-11 touch-manipulation gap-2 px-4 text-sm"
 						>
-							<X className="h-3 w-3" />
+							<X className="h-4 w-4" />
 							Clear
 						</Button>
 					</div>
@@ -419,26 +421,25 @@ export function ProgressInput({
 					{/* Summary and save */}
 					<div className="flex items-center justify-between border-t pt-4">
 						<div className="flex flex-col gap-0.5">
-							<span className="text-muted-foreground text-xs">
+							<span className="text-muted-foreground text-sm">
 								Total Progress
 							</span>
-							<span className="font-semibold text-sm">
+							<span className="font-semibold text-base">
 								{totalCompletedReps} / {totalTargetReps} reps
 							</span>
 						</div>
 						<Button
 							type="button"
-							size="sm"
 							onClick={handleSave}
 							disabled={
 								recordProgress.isPending ||
 								updateProgress.isPending ||
 								setInputs.every((set) => set.actualReps === "")
 							}
-							className="h-8 gap-1 text-xs"
+							className="h-11 min-h-11 touch-manipulation gap-2 px-6 text-base"
 						>
 							{(recordProgress.isPending || updateProgress.isPending) && (
-								<Loader2 className="h-3 w-3 animate-spin" />
+								<Loader2 className="h-4 w-4 animate-spin" />
 							)}
 							{hasExistingProgress ? "Update" : "Save"} Progress
 						</Button>
