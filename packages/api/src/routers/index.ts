@@ -1,5 +1,12 @@
 import { protectedProcedure, publicProcedure, router } from "../index";
+import { aiSummaryRouter } from "./ai-summary";
+import { exerciseRouter } from "./exercise";
+import { exerciseParserRouter } from "./exercise-parser";
+import { friendRouter } from "./friend";
+import { progressRouter } from "./progress";
+import { sessionRouter } from "./session";
 import { todoRouter } from "./todo";
+import { trainingRouter } from "./training";
 
 export const appRouter = router({
 	healthCheck: publicProcedure.query(() => {
@@ -12,5 +19,12 @@ export const appRouter = router({
 		};
 	}),
 	todo: todoRouter,
+	training: trainingRouter,
+	exercise: exerciseRouter,
+	exerciseParser: exerciseParserRouter,
+	session: sessionRouter,
+	progress: progressRouter,
+	friend: friendRouter,
+	aiSummary: aiSummaryRouter,
 });
 export type AppRouter = typeof appRouter;

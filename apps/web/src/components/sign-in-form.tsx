@@ -1,5 +1,7 @@
 import { useForm } from "@tanstack/react-form";
+import type { Route } from "next";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import z from "zod";
 
@@ -12,11 +14,14 @@ import { Label } from "./ui/label";
 
 export default function SignInForm({
 	onSwitchToSignUp,
+	redirectPath = "/dashboard",
 }: {
 	onSwitchToSignUp: () => void;
+	redirectPath?: string;
 }) {
 	const router = useRouter();
 	const { isPending } = authClient.useSession();
+	const [isGooglePending, setIsGooglePending] = useState(false);
 
 	const form = useForm({
 		defaultValues: {
@@ -31,7 +36,7 @@ export default function SignInForm({
 				},
 				{
 					onSuccess: () => {
-						router.push("/dashboard");
+						router.push(redirectPath as Route);
 						toast.success("Sign in successful");
 					},
 					onError: (error) => {
@@ -48,6 +53,31 @@ export default function SignInForm({
 		},
 	});
 
+	const handleGoogleSignIn = async () => {
+		if (isGooglePending) {
+			return;
+		}
+
+		try {
+			setIsGooglePending(true);
+			const redirectUrl = new URL(
+				redirectPath,
+				window.location.origin,
+			).toString();
+			await authClient.signIn.social({
+				provider: "google",
+				callbackURL: redirectUrl,
+				newUserCallbackURL: redirectUrl,
+				errorCallbackURL: window.location.href,
+			});
+			toast.message("Redirecting to Google...");
+		} catch (_error) {
+			toast.error("Failed to sign in with Google");
+		} finally {
+			setIsGooglePending(false);
+		}
+	};
+
 	if (isPending) {
 		return <Loader />;
 	}
@@ -55,6 +85,22 @@ export default function SignInForm({
 	return (
 		<div className="mx-auto mt-10 w-full max-w-md p-6">
 			<h1 className="mb-6 text-center font-bold text-3xl">Welcome Back</h1>
+
+			<Button
+				type="button"
+				variant="outline"
+				className="w-full"
+				onClick={handleGoogleSignIn}
+				disabled={isGooglePending}
+			>
+				{isGooglePending ? "Connecting to Google..." : "Continue with Google"}
+			</Button>
+
+			<div className="my-6 flex items-center gap-4 text-muted-foreground text-sm">
+				<div className="h-px flex-1 bg-border" />
+				<span>or</span>
+				<div className="h-px flex-1 bg-border" />
+			</div>
 
 			<form
 				onSubmit={(e) => {

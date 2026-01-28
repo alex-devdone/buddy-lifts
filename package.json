@@ -22,6 +22,7 @@
 	"scripts": {
 		"dev": "turbo dev",
 		"build": "turbo build",
+		"prod": "turbo build && turbo -F web start",
 		"check-types": "turbo check-types",
 		"dev:native": "turbo -F native dev",
 		"dev:web": "turbo -F web dev",
@@ -38,19 +39,26 @@
 		"@buddy-lifts/env": "workspace:*",
 		"@supabase/ssr": "^0.8.0",
 		"@supabase/supabase-js": "^2.91.1",
+		"date-fns": "^4.1.0",
 		"dotenv": "catalog:",
 		"drizzle-orm": "0.45.1",
+		"nanoid": "^5.1.6",
 		"next": "16.1.4",
 		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.0",
 		"@buddy-lifts/config": "workspace:*",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.2",
+		"@testing-library/user-event": "^14.6.1",
 		"@types/node": "^22.13.14",
+		"happy-dom": "^20.3.7",
 		"husky": "^9.1.7",
 		"lint-staged": "^16.1.2",
 		"turbo": "^2.6.3",
-		"typescript": "catalog:"
+		"typescript": "catalog:",
+		"vitest": "^4.0.18"
 	},
 	"lint-staged": {
 		"*.{js,ts,cjs,mjs,d.cts,d.mts,jsx,tsx,json,jsonc}": [

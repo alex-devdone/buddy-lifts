@@ -9,7 +9,10 @@
 			"default": "./src/*.ts"
 		}
 	},
-	"scripts": {},
+	"scripts": {
+		"check-types": "tsc -p tsconfig.json --noEmit",
+		"test": "bun test"
+	},
 	"dependencies": {
 		"@buddy-lifts/auth": "workspace:*",
 		"@buddy-lifts/db": "workspace:*",
@@ -24,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@buddy-lifts/config": "workspace:*",
+		"@types/bun": "latest",
 		"typescript": "catalog:"
 	}
 }

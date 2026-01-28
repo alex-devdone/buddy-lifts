@@ -13,6 +13,9 @@
 		"dotenv": "catalog:",
 		"zod": "catalog:"
 	},
+	"scripts": {
+		"check-types": "tsc -p tsconfig.json --noEmit"
+	},
 	"devDependencies": {
 		"@buddy-lifts/config": "workspace:*",
 		"@types/node": "^22.13.14",

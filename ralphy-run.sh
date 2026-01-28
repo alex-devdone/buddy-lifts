@@ -2,8 +2,8 @@
 set -euo pipefail
 
 log_file=".ralphy/ralphy-run.log"
-total_runs=3
-total_steps=2
+total_runs=10
+total_steps=3
 
 log() {
   echo "$1" | tee -a "$log_file"
@@ -32,7 +32,7 @@ run_step() {
 
   if [ "$status" -ne 0 ]; then
     rm -f "$tmp"
-    exit "$status"
+    return "$status"
   fi
 
   if grep -q "$stop_phrase" "$tmp"; then
@@ -48,22 +48,50 @@ start_all="$(date +%s)"
 log "Run started $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 for run in $(seq 1 "$total_runs"); do
-  run_step "Run ${run}/${total_runs} Step 1/${total_steps} (with --codex)" \
-    ./ralphy.sh --prd .ralphy/PRD.md --codex --create-pr || rc=$?
+  sonnet_failed=false
+  codex_failed=false
+  gemini_failed=false
+
+  # Step 1: Sonnet (Claude Code)
+  run_step "Run ${run}/${total_runs} Step 1/${total_steps} (with --sonnet)" \
+    ralphy --prd .ralphy/PRD.md --sonnet --create-pr || rc=$?
   if [ "${rc:-0}" -eq 2 ]; then
     break
+  elif [ -n "${rc:-}" ] && [ "$rc" -ne 0 ]; then
+    sonnet_failed=true
   fi
   unset rc
 
-  run_step "Run ${run}/${total_runs} Step 2/${total_steps} (with --sonnet)" \
-    ./ralphy.sh --prd .ralphy/PRD.md --sonnet --create-pr || rc=$?
+  # Step 2: Gemini
+  run_step "Run ${run}/${total_runs} Step 2/${total_steps} (with --gemini)" \
+    ralphy --prd .ralphy/PRD.md --gemini --create-pr || rc=$?
   if [ "${rc:-0}" -eq 2 ]; then
     break
+  elif [ -n "${rc:-}" ] && [ "$rc" -ne 0 ]; then
+    gemini_failed=true
   fi
   unset rc
+
+  # Step 3: Codex (OpenAI)
+  run_step "Run ${run}/${total_runs} Step 3/${total_steps} (with --codex)" \
+    ralphy --prd .ralphy/PRD.md --codex --create-pr || rc=$?
+  if [ "${rc:-0}" -eq 2 ]; then
+    break
+  elif [ -n "${rc:-}" ] && [ "$rc" -ne 0 ]; then
+    codex_failed=true
+  fi
+  unset rc
+
+  # If all models failed, wait 5 minutes before retrying
+  if [ "$codex_failed" = true ] && [ "$sonnet_failed" = true ] && [ "$gemini_failed" = true ]; then
+    log "All models timed out, waiting 5 minutes before retry..."
+    sleep 300
+  fi
 done
 
 end_all="$(date +%s)"
 total_duration=$((end_all - start_all))
 log "Run finished $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 log "Total duration ${total_duration}s"
+
+# ralphy --prd .ralphy/PRD.md --gemini --create-pr

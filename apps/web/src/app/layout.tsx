@@ -19,6 +19,16 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
 	title: "buddy-lifts",
 	description: "buddy-lifts",
+	viewport: {
+		width: "device-width",
+		initialScale: 1,
+		maximumScale: 1,
+		userScalable: false,
+	},
+	themeColor: [
+		{ media: "(prefers-color-scheme: light)", color: "#ffffff" },
+		{ media: "(prefers-color-scheme: dark)", color: "#000000" },
+	],
 };
 
 export default function RootLayout({
