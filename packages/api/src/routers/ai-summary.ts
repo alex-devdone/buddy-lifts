@@ -37,7 +37,7 @@ interface ExercisePerformance {
 /**
  * Complete participant summary
  */
-interface ParticipantSummary {
+export interface ParticipantSummary {
 	userId: string;
 	userName: string;
 	exercises: ExercisePerformance[];
@@ -61,7 +61,7 @@ interface ParticipantComparison {
 /**
  * Full training summary output
  */
-interface TrainingSummary {
+export interface TrainingSummary {
 	sessionId: string;
 	trainingName: string;
 	trainingDescription: string | null;
@@ -148,6 +148,7 @@ function generateComparisons(
 	);
 
 	const winner = sorted[0];
+	if (!winner) return [];
 
 	return sorted.map((participant) => ({
 		userId: participant.userId,
@@ -171,6 +172,7 @@ function generateSessionInsights(participants: ParticipantSummary[]): string[] {
 
 	if (participants.length === 1) {
 		const p = participants[0];
+		if (!p) return insights;
 		if (p.overallCompletion >= 90) {
 			insights.push("Excellent solo session! You're on fire!");
 		} else if (p.overallCompletion >= 70) {
@@ -209,10 +211,13 @@ function generateSessionInsights(participants: ParticipantSummary[]): string[] {
 	);
 
 	if (sorted.length >= 2) {
-		const gap = sorted[0].overallCompletion - sorted[1].overallCompletion;
+		const first = sorted[0];
+		const second = sorted[1];
+		if (!first || !second) return insights;
+		const gap = first.overallCompletion - second.overallCompletion;
 		if (gap <= 5 && gap >= 0) {
 			insights.push(
-				`What a close match! Just ${gap}% between ${sorted[0].userName} and ${sorted[1].userName}!`,
+				`What a close match! Just ${gap}% between ${first.userName} and ${second.userName}!`,
 			);
 		}
 	}

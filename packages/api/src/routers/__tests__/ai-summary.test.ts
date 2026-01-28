@@ -1,5 +1,3 @@
-import { describe, expect, test } from "bun:test";
-
 /**
  * AI Summary Router Tests
  *
@@ -112,6 +110,7 @@ function generateComparisons(
 	);
 
 	const winner = sorted[0];
+	if (!winner) return [];
 
 	return sorted.map((participant) => ({
 		userId: participant.userId,
@@ -135,6 +134,7 @@ function generateSessionInsights(participants: ParticipantSummary[]): string[] {
 
 	if (participants.length === 1) {
 		const p = participants[0];
+		if (!p) return insights;
 		if (p.overallCompletion >= 90) {
 			insights.push("Excellent solo session! You're on fire!");
 		} else if (p.overallCompletion >= 70) {
@@ -173,10 +173,13 @@ function generateSessionInsights(participants: ParticipantSummary[]): string[] {
 	);
 
 	if (sorted.length >= 2) {
-		const gap = sorted[0].overallCompletion - sorted[1].overallCompletion;
+		const first = sorted[0];
+		const second = sorted[1];
+		if (!first || !second) return insights;
+		const gap = first.overallCompletion - second.overallCompletion;
 		if (gap <= 5 && gap >= 0) {
 			insights.push(
-				`What a close match! Just ${gap}% between ${sorted[0].userName} and ${sorted[1].userName}!`,
+				`What a close match! Just ${gap}% between ${first.userName} and ${second.userName}!`,
 			);
 		}
 	}
@@ -497,10 +500,14 @@ describe("AI Summary - generateComparisons", () => {
 		expect(comparisons).toHaveLength(2);
 
 		// Both should be marked as winner (tie)
-		expect(comparisons[0].isWinner).toBe(true);
-		expect(comparisons[1].isWinner).toBe(true);
-		expect(comparisons[0].differenceFromWinner).toBe(0);
-		expect(comparisons[1].differenceFromWinner).toBe(0);
+		const [first, second] = comparisons;
+		if (!first || !second) {
+			throw new Error("Expected comparisons to contain two entries.");
+		}
+		expect(first.isWinner).toBe(true);
+		expect(second.isWinner).toBe(true);
+		expect(first.differenceFromWinner).toBe(0);
+		expect(second.differenceFromWinner).toBe(0);
 	});
 });
 
@@ -732,11 +739,15 @@ describe("AI Summary - Integration scenarios", () => {
 		expect(highlights).toHaveLength(2);
 
 		// Verify winner
-		expect(comparisons[0].userName).toBe("Alice");
-		expect(comparisons[0].isWinner).toBe(true);
+		const [firstComparison, secondComparison] = comparisons;
+		if (!firstComparison || !secondComparison) {
+			throw new Error("Expected comparisons to contain two entries.");
+		}
+		expect(firstComparison.userName).toBe("Alice");
+		expect(firstComparison.isWinner).toBe(true);
 
 		// Verify gap
-		expect(comparisons[1].differenceFromWinner).toBe(3);
+		expect(secondComparison.differenceFromWinner).toBe(3);
 
 		// Verify close competition detected
 		expect(insights.some((i) => i.includes("close match"))).toBe(true);
@@ -773,7 +784,11 @@ describe("AI Summary - Integration scenarios", () => {
 			},
 		];
 
-		const highlights = generateHighlights(participants[0]);
+		const [participant] = participants;
+		if (!participant) {
+			throw new Error("Expected participant data.");
+		}
+		const highlights = generateHighlights(participant);
 
 		// Should have both positive and improvement highlights
 		expect(highlights.some((h) => h.includes("Nailed 1 exercise"))).toBe(true);

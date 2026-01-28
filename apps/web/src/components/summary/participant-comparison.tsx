@@ -112,8 +112,10 @@ export function ParticipantComparison({
 }: ParticipantComparisonProps) {
 	// Create a map for quick lookup of detailed participant data
 	const participantMap = useMemo(() => {
-		if (!participants) return new Map();
-		return new Map(participants.map((p) => [p.userId, p]));
+		if (!participants) return new Map<string, ParticipantSummaryData>();
+		return new Map<string, ParticipantSummaryData>(
+			participants.map((p) => [p.userId, p]),
+		);
 	}, [participants]);
 
 	// Calculate max completion for relative progress bars
@@ -220,7 +222,7 @@ export function ParticipantComparison({
 									<div className="h-2 w-full overflow-hidden rounded-full bg-muted">
 										<div
 											className={`h-full transition-all duration-500 ${getProgressColorClasses(comparison.overallCompletion)}`}
-											style={{ width: `${comparison.overallCompletion}%` }}
+											style={{ width: `${progressWidth}%` }}
 											role="progressbar"
 											aria-valuenow={comparison.overallCompletion}
 											aria-valuemin={0}

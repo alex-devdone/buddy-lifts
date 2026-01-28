@@ -7,7 +7,6 @@
  * Displays participant comparisons, highlights, and insights for completed training sessions.
  */
 
-import { describe, expect, it, vi } from "vitest";
 import { TrainingSummary } from "../training-summary";
 
 describe("TrainingSummary Component", () => {
@@ -147,7 +146,8 @@ describe("TrainingSummary Component", () => {
 				"apps/web/src/components/summary/training-summary.tsx",
 				"utf-8",
 			);
-			expect(content).toContain("trpc.aiSummary.generate.useQuery");
+			expect(content).toContain("trpc.aiSummary.generate.queryOptions");
+			expect(content).toContain("useQuery");
 		});
 
 		it("should compute currentUserRanking with useMemo", async () => {
@@ -188,7 +188,8 @@ describe("TrainingSummary Component", () => {
 				"apps/web/src/components/summary/training-summary.tsx",
 				"utf-8",
 			);
-			expect(content).toContain("trpc.aiSummary.generate.useQuery");
+			expect(content).toContain("trpc.aiSummary.generate.queryOptions");
+			expect(content).toContain("useQuery");
 		});
 
 		it("should not use Supabase direct queries (uses tRPC for computed data)", async () => {
@@ -393,7 +394,8 @@ describe("TrainingSummary Component", () => {
 				"apps/web/src/components/summary/training-summary.tsx",
 				"utf-8",
 			);
-			expect(content).toContain("grid-cols-2");
+			expect(content).toContain("grid-cols-1");
+			expect(content).toContain("sm:grid-cols-2");
 			expect(content).toContain("text-sm");
 			expect(content).toContain("text-xs");
 			expect(content).toContain("text-lg");

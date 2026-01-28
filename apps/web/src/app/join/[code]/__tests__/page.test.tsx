@@ -17,10 +17,6 @@
  * - Redirects to active session page on success
  */
 
-import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 // Mock dependencies
 vi.mock("next/navigation", () => ({
 	useRouter: () => ({
@@ -123,13 +119,17 @@ describe("Join Page - Server Component", () => {
 		it("should redirect to login with invite code if no session exists", () => {
 			expect(pageContent).toContain("if (!session?.user)");
 			expect(pageContent).toContain("redirect");
-			expect(pageContent).toContain("/login?redirect=/join/");
+			expect(pageContent).toContain("/login?redirect=");
 		});
 
 		it("should extract inviteCode from params", () => {
 			expect(pageContent).toContain(
 				"const { code: inviteCode } = await params;",
 			);
+		});
+
+		it("should read access from searchParams for redirect handling", () => {
+			expect(pageContent).toContain("const { access } = await searchParams");
 		});
 
 		it("should render JoinPageClient component when authenticated", () => {
@@ -156,6 +156,9 @@ describe("Join Page - Server Component", () => {
 		it("should define PageProps interface", () => {
 			expect(pageContent).toContain("interface PageProps");
 			expect(pageContent).toContain("params: Promise<{ code: string }>");
+			expect(pageContent).toContain(
+				"searchParams: Promise<{ access?: string }>",
+			);
 		});
 
 		it("should properly type the async params", () => {
@@ -204,6 +207,13 @@ describe("JoinPageClient - Client Component", () => {
 			expect(content).toContain("const router = useRouter()");
 		});
 
+		it("should read access type from search params", () => {
+			expect(content).toContain("useSearchParams");
+			expect(content).toContain("searchParams.get");
+			expect(content).toContain('accessParam === "read"');
+			expect(content).toContain('accessParam === "admin"');
+		});
+
 		it("should use tRPC session.join mutation", () => {
 			expect(content).toContain("trpc.session.join");
 			expect(content).toContain("useMutation");
@@ -211,7 +221,9 @@ describe("JoinPageClient - Client Component", () => {
 
 		it("should have useEffect for automatic join on mount", () => {
 			expect(content).toContain("useEffect");
-			expect(content).toContain("joinMutation.mutate({ inviteCode })");
+			expect(content).toContain(
+				"joinMutation.mutate({ inviteCode, accessType })",
+			);
 		});
 	});
 
@@ -228,7 +240,7 @@ describe("JoinPageClient - Client Component", () => {
 		});
 
 		it("should call mutate with inviteCode", () => {
-			expect(content).toContain("mutate({ inviteCode })");
+			expect(content).toContain("mutate({ inviteCode, accessType })");
 		});
 	});
 
@@ -450,7 +462,7 @@ describe("Login Page Redirect Integration", () => {
 		});
 
 		it("should use redirectPath in onSuccess callback", () => {
-			expect(signInContent).toContain("router.push(redirectPath)");
+			expect(signInContent).toContain("router.push(redirectPath as Route)");
 		});
 	});
 
@@ -464,7 +476,7 @@ describe("Login Page Redirect Integration", () => {
 		});
 
 		it("should use redirectPath in onSuccess callback", () => {
-			expect(signUpContent).toContain("router.push(redirectPath)");
+			expect(signUpContent).toContain("router.push(redirectPath as Route)");
 		});
 	});
 });
@@ -485,13 +497,13 @@ describe("Join Page Integration", () => {
 
 	describe("Authentication Redirect Flow", () => {
 		it("should preserve invite code when redirecting to login", () => {
-			expect(pageContent).toContain("/login?redirect=/join/");
+			expect(pageContent).toContain("/login?redirect=");
 			expect(pageContent).toContain("code: inviteCode");
 		});
 
 		it("should use proper redirect URL format", () => {
-			expect(pageContent).toContain(
-				"redirect(`/login?redirect=/join/${code}`)",
+			expect(pageContent).toMatch(
+				/redirect\(`\/login\?redirect=\$\{encodeURIComponent\(redirectPath\)\}`\)/,
 			);
 		});
 	});

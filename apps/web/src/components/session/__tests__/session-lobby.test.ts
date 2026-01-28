@@ -1,5 +1,3 @@
-import { describe, expect, test } from "bun:test";
-
 /**
  * Structural tests for SessionLobby component
  *
@@ -271,6 +269,7 @@ describe("SessionLobby Component", () => {
 		expect(fileContent).toContain("toast.error");
 		expect(fileContent).toContain("Invite link copied!");
 		expect(fileContent).toContain("Access type updated");
+		expect(fileContent).toContain("joined the session");
 		expect(fileContent).toContain("Left session");
 		expect(fileContent).toContain("Session ended");
 	});

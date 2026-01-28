@@ -18,8 +18,6 @@
  * - Real-time updates via Supabase
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("Friends Page", () => {
 	describe("Server Component (page.tsx)", () => {
 		it("should have correct file structure", async () => {
@@ -171,8 +169,8 @@ describe("Friends Page", () => {
 			);
 
 			// Check for bidirectional query
-			expect(content).toContain(
-				"user_id.eq.${currentUserId},friend_id.eq.${currentUserId}",
+			expect(content).toMatch(
+				/user_id\.eq\.\$\{currentUserId\},friend_id\.eq\.\$\{currentUserId\}/,
 			);
 
 			// Check for ordering

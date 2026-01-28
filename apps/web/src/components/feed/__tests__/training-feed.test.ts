@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/feed/__tests__/training-feed.test.ts
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("TrainingFeed Component", () => {
 	describe("Component Structure", () => {
 		it("should export the component", () => {

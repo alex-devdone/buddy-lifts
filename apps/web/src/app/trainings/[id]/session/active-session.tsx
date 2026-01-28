@@ -9,7 +9,8 @@ import {
 	Users,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import type { TouchEvent } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { BodyProgress } from "@/components/session/body-progress";
 import { ExerciseChecklist } from "@/components/session/exercise-checklist";
@@ -92,6 +93,9 @@ export function ActiveSession({
 	const [selectedExerciseId, setSelectedExerciseId] = useState<string | null>(
 		null,
 	);
+	const swipeStartRef = useRef<{ x: number; y: number } | null>(null);
+	const swipeHandledRef = useRef(false);
+	const completionToastShownRef = useRef(false);
 
 	// Fetch training details using Supabase (read)
 	const { data: trainingData, isLoading: trainingLoading } =
@@ -108,6 +112,7 @@ export function ActiveSession({
 		data: sessionData,
 		isLoading: sessionLoading,
 		error: sessionError,
+		realtimeStatus: sessionRealtimeStatus,
 	} = useSupabaseQuery<TrainingSession>({
 		queryFn: (supabase) =>
 			supabase
@@ -133,6 +138,10 @@ export function ActiveSession({
 		table: "exercise",
 	});
 
+	const redirectToSummary = useCallback(() => {
+		router.push(`/trainings/${trainingId}/summary?sessionId=${sessionId}`);
+	}, [router, trainingId, sessionId]);
+
 	// End session mutation (host only)
 	const endSession = useMutation(
 		trpc.session.end.mutationOptions({
@@ -140,7 +149,7 @@ export function ActiveSession({
 				toast.success("Session completed!");
 				// Redirect to training detail after a short delay
 				setTimeout(() => {
-					router.push(`/trainings/${trainingId}`);
+					redirectToSummary();
 				}, 1500);
 			},
 			onError: (error) => {
@@ -164,6 +173,26 @@ export function ActiveSession({
 
 	// Determine if current user is host
 	const isHost = session?.hostUserId === currentUserId;
+	const realtimeIndicator =
+		sessionRealtimeStatus === "SUBSCRIBED"
+			? {
+					label: "Realtime Online",
+					statusClass:
+						"border-emerald-500/30 bg-emerald-500/10 text-emerald-600",
+					dotClass: "bg-emerald-500",
+				}
+			: sessionRealtimeStatus === "CONNECTING"
+				? {
+						label: "Realtime Connecting",
+						statusClass:
+							"border-yellow-500/30 bg-yellow-500/10 text-yellow-600",
+						dotClass: "bg-yellow-500",
+					}
+				: {
+						label: "Realtime Offline",
+						statusClass: "border-red-500/30 bg-red-500/10 text-red-600",
+						dotClass: "bg-red-500",
+					};
 
 	// Update view based on session status
 	useEffect(() => {
@@ -179,11 +208,24 @@ export function ActiveSession({
 		} else if (session.status === "completed") {
 			// Session completed - redirect after showing completion
 			const redirectTimer = setTimeout(() => {
-				router.push(`/trainings/${trainingId}`);
+				redirectToSummary();
 			}, 3000);
 			return () => clearTimeout(redirectTimer);
 		}
-	}, [session, currentView, router, trainingId]);
+	}, [session, currentView, redirectToSummary]);
+
+	useEffect(() => {
+		if (!session) return;
+
+		if (session.status === "completed") {
+			if (!completionToastShownRef.current && !isHost) {
+				toast.success("Session completed!");
+				completionToastShownRef.current = true;
+			}
+		} else {
+			completionToastShownRef.current = false;
+		}
+	}, [session, isHost]);
 
 	// Handle back to training
 	const handleBackToTraining = useCallback(() => {
@@ -200,6 +242,54 @@ export function ActiveSession({
 	const handleDeselectExercise = useCallback(() => {
 		setSelectedExerciseId(null);
 		setCurrentView("checklist");
+	}, []);
+
+	const handleExerciseNavigation = useCallback(
+		(direction: "next" | "previous") => {
+			if (!selectedExerciseId || exercises.length === 0) return;
+			const currentIndex = exercises.findIndex(
+				(exercise) => exercise.id === selectedExerciseId,
+			);
+			if (currentIndex === -1) return;
+			const offset = direction === "next" ? 1 : -1;
+			const nextIndex = currentIndex + offset;
+			if (nextIndex < 0 || nextIndex >= exercises.length) return;
+			setSelectedExerciseId(exercises[nextIndex].id);
+		},
+		[exercises, selectedExerciseId],
+	);
+
+	const handleExerciseSwipeStart = useCallback(
+		(event: TouchEvent<HTMLDivElement>) => {
+			if (event.touches.length !== 1) return;
+			const touch = event.touches[0];
+			if (!touch) return;
+			swipeStartRef.current = { x: touch.clientX, y: touch.clientY };
+			swipeHandledRef.current = false;
+		},
+		[],
+	);
+
+	const handleExerciseSwipeMove = useCallback(
+		(event: TouchEvent<HTMLDivElement>) => {
+			if (!swipeStartRef.current || swipeHandledRef.current) return;
+			if (event.touches.length !== 1) return;
+			const touch = event.touches[0];
+			if (!touch) return;
+			const deltaX = touch.clientX - swipeStartRef.current.x;
+			const deltaY = touch.clientY - swipeStartRef.current.y;
+			if (Math.abs(deltaX) < 60 || Math.abs(deltaX) < Math.abs(deltaY) * 1.5) {
+				return;
+			}
+			handleExerciseNavigation(deltaX < 0 ? "next" : "previous");
+			swipeHandledRef.current = true;
+		},
+		[handleExerciseNavigation],
+	);
+
+	const handleExerciseSwipeEnd = useCallback(() => {
+		swipeStartRef.current = null;
+		swipeHandledRef.current = false;
 	}, []);
 
 	// Handle end session
@@ -265,7 +355,7 @@ export function ActiveSession({
 				<div className="text-center">
 					<h2 className="font-semibold text-lg">Session Completed!</h2>
 					<p className="text-muted-foreground text-sm">
-						Great job! Redirecting to training...
+						Great job! Redirecting to summary...
 					</p>
 				</div>
 			</div>
@@ -313,6 +403,18 @@ export function ActiveSession({
 							)}
 						/>
 						{session.status === "active" ? "Live Session" : "Starting Soon"}
+					</div>
+					<div
+						className={cn(
+							"flex items-center gap-1.5 rounded-full border px-3 py-1 font-medium text-xs",
+							realtimeIndicator.statusClass,
+						)}
+						aria-live="polite"
+					>
+						<div
+							className={cn("h-2 w-2 rounded-full", realtimeIndicator.dotClass)}
+						/>
+						{realtimeIndicator.label}
 					</div>
 
 					{/* Share invite button (host only) */}
@@ -399,6 +501,7 @@ export function ActiveSession({
 								{exercises.length > 0 && (
 									<ParticipantGrid
 										sessionId={sessionId}
+										trainingId={trainingId}
 										currentUserId={currentUserId}
 										hostUserId={session.hostUserId}
 									/>
@@ -408,7 +511,13 @@ export function ActiveSession({
 							{/* Right Column - Body Progress & Exercise Input */}
 							<div className="flex flex-col gap-6">
 								{selectedExerciseId ? (
-									<>
+									<div
+										className="flex touch-pan-y flex-col gap-4"
+										onTouchStart={handleExerciseSwipeStart}
+										onTouchMove={handleExerciseSwipeMove}
+										onTouchEnd={handleExerciseSwipeEnd}
+										onTouchCancel={handleExerciseSwipeEnd}
+									>
 										<Button
 											variant="outline"
 											size="sm"
@@ -424,7 +533,7 @@ export function ActiveSession({
 											trainingId={trainingId}
 											exerciseId={selectedExerciseId}
 										/>
-									</>
+									</div>
 								) : (
 									<>
 										{exercises.length > 0 && (

@@ -2,7 +2,7 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
-import { Loader2, Trash2, User, UserMinus } from "lucide-react";
+import { Trash2, User, UserMinus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/card";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 import { trpc } from "@/utils/trpc";
+import { FriendCardSkeleton } from "./friend-card-skeleton";
 
 interface Friend {
 	id: string;
@@ -146,8 +147,10 @@ export function FriendList({
 
 	if (isLoading) {
 		return (
-			<div className="flex items-center justify-center py-12">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+			<div className="flex flex-col gap-3">
+				<FriendCardSkeleton />
+				<FriendCardSkeleton />
+				<FriendCardSkeleton />
 			</div>
 		);
 	}

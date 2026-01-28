@@ -2,12 +2,14 @@
 
 import { Activity, Crown, Loader2, Shield, Trash2, User } from "lucide-react";
 import { useCallback, useMemo } from "react";
+import { BodyProgress } from "@/components/session/body-progress";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 
 interface ParticipantGridProps {
 	sessionId: string;
+	trainingId: string;
 	currentUserId?: string;
 	hostUserId?: string;
 	showKickButton?: boolean;
@@ -52,6 +54,7 @@ interface ExerciseProgress {
  */
 export function ParticipantGrid({
 	sessionId,
+	trainingId,
 	currentUserId,
 	hostUserId,
 	showKickButton = false,
@@ -158,6 +161,12 @@ export function ParticipantGrid({
 		return "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3";
 	}, [participants.length]);
 
+	const bodyProgressSize = useMemo<"sm" | "md">(() => {
+		const count = participants.length;
+		if (count === 1) return "md";
+		return "sm";
+	}, [participants.length]);
+
 	if (participantsLoading) {
 		return (
 			<div className="flex items-center justify-center py-8">
@@ -239,6 +248,16 @@ export function ParticipantGrid({
 						</CardHeader>
 
 						<CardContent className="space-y-3">
+							<div className="flex items-center justify-center rounded-lg bg-muted/40 p-3">
+								<BodyProgress
+									sessionId={sessionId}
+									trainingId={trainingId}
+									userId={participant.userId}
+									size={bodyProgressSize}
+									showLabel={false}
+								/>
+							</div>
+
 							{/* Progress bar */}
 							<div className="space-y-1">
 								<div className="flex items-center justify-between text-xs">

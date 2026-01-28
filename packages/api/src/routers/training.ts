@@ -1,9 +1,13 @@
 import { and, db, eq } from "@buddy-lifts/db";
-import { training } from "@buddy-lifts/db/schema/training";
+import { exercise, training } from "@buddy-lifts/db/schema/training";
 import { TRPCError } from "@trpc/server";
 import z from "zod";
 
 import { protectedProcedure, router } from "../index";
+import {
+	exercisesToDbFormat,
+	parseExerciseInput,
+} from "../utils/exercise-parser";
 
 /**
  * Training Router - Hybrid Pattern: Mutations Only
@@ -37,6 +41,69 @@ export const trainingRouter = router({
 				.returning();
 
 			return newTraining[0];
+		}),
+	/**
+	 * Create a new training with exercises from natural language input
+	 * Requires authentication
+	 */
+	createWithExercises: protectedProcedure
+		.input(
+			z.object({
+				name: z.string().min(1, "Training name is required"),
+				description: z.string().optional(),
+				input: z
+					.string()
+					.min(3, "Input must be at least 3 characters")
+					.max(500, "Input too long"),
+			}),
+		)
+		.mutation(async ({ input, ctx }) => {
+			const exercises = parseExerciseInput(input.input);
+
+			if (exercises.length === 0) {
+				throw new TRPCError({
+					code: "BAD_REQUEST",
+					message:
+						"Could not parse any exercises. Try formats like '10x4 pushup' or '5 sets of 10 bench press'",
+				});
+			}
+
+			const result = await db.transaction(async (tx) => {
+				const newTraining = await tx
+					.insert(training)
+					.values({
+						userId: ctx.session.user.id,
+						name: input.name,
+						description: input.description,
+					})
+					.returning();
+
+				const trainingRecord = newTraining[0];
+				if (!trainingRecord) {
+					throw new TRPCError({
+						code: "INTERNAL_SERVER_ERROR",
+						message: "Failed to create training",
+					});
+				}
+
+				const exercisesToInsert = exercisesToDbFormat(exercises).map((ex) => ({
+					trainingId: trainingRecord.id,
+					...ex,
+				}));
+
+				const createdExercises = await tx
+					.insert(exercise)
+					.values(exercisesToInsert)
+					.returning();
+
+				return { training: trainingRecord, exercises: createdExercises };
+			});
+
+			return {
+				training: result.training,
+				exercises: result.exercises,
+				count: result.exercises.length,
+			};
 		}),
 
 	/**

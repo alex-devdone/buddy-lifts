@@ -1,5 +1,3 @@
-import { describe, expect, test } from "bun:test";
-
 /**
  * Structural tests for ExerciseParserInput component
  *

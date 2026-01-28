@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { formatDistanceToNow } from "date-fns";
 import {
 	Award,
@@ -11,7 +12,7 @@ import {
 	Trophy,
 	Users,
 } from "lucide-react";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -50,12 +51,14 @@ export function TrainingSummary({
 		data: summary,
 		isLoading,
 		error,
-	} = trpc.aiSummary.generate.useQuery(
-		{ sessionId },
-		{
-			enabled: !!sessionId,
-			retry: false,
-		},
+	} = useQuery(
+		trpc.aiSummary.generate.queryOptions(
+			{ sessionId },
+			{
+				enabled: !!sessionId,
+				retry: false,
+			},
+		),
 	);
 
 	// Get current user's ranking
@@ -83,6 +86,10 @@ export function TrainingSummary({
 				return <Badge variant="outline">{`${index + 1}th`}</Badge>;
 		}
 	}, []);
+
+	const [activeTab, setActiveTab] = useState<"comparisons" | "insights">(
+		"comparisons",
+	);
 
 	if (isLoading) {
 		return (
@@ -144,7 +151,7 @@ export function TrainingSummary({
 			</div>
 
 			{/* Overall Stats */}
-			<div className="grid grid-cols-2 gap-3">
+			<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 				<Card>
 					<CardContent className="flex flex-col items-center justify-center py-4">
 						<div className="mb-1 flex items-center gap-1 text-muted-foreground text-xs">
@@ -215,7 +222,7 @@ export function TrainingSummary({
 						</div>
 					</CardHeader>
 					<CardContent className="space-y-3">
-						<div className="grid grid-cols-2 gap-3">
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 							<div>
 								<p className="text-muted-foreground text-xs">Completion</p>
 								<p className="font-bold text-lg">
@@ -243,8 +250,14 @@ export function TrainingSummary({
 			)}
 
 			{/* Tabs for detailed views */}
-			<Tabs defaultValue="comparisons" className="w-full">
-				<TabsList className="grid w-full grid-cols-2">
+			<Tabs
+				value={activeTab}
+				onValueChange={(value) =>
+					setActiveTab(value as "comparisons" | "insights")
+				}
+				className="w-full"
+			>
+				<TabsList className="grid w-full grid-cols-1 sm:grid-cols-2">
 					<TabsTrigger value="comparisons">Rankings</TabsTrigger>
 					<TabsTrigger value="insights">Insights</TabsTrigger>
 				</TabsList>

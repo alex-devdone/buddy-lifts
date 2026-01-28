@@ -1,5 +1,3 @@
-import { describe, expect, test } from "bun:test";
-
 describe("Friend Router - Structural Tests", () => {
 	describe("Router structure", () => {
 		test("friend router file exists and exports router", () => {

@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/app/trainings/[id]/session/__tests__/page.test.tsx
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("Active Session Page Component", () => {
 	describe("Component Structure", () => {
 		it("should export the page component", () => {
@@ -89,7 +87,7 @@ describe("Active Session Page Component", () => {
 			const fs = require("node:fs");
 			const content = fs.readFileSync(`${__dirname}/../page.tsx`, "utf-8");
 			expect(content).toContain("if (!sessionId)");
-			expect(content).toContain("redirect(`/trainings/${trainingId}`)");
+			expect(content).toMatch(/redirect\(`\/trainings\/\$\{trainingId\}`\)/);
 		});
 
 		it("should render ActiveSession component when authenticated with sessionId", () => {
@@ -440,7 +438,9 @@ describe("Active Session Client Component", () => {
 				"utf-8",
 			);
 			expect(content).toContain("handleBackToTraining");
-			expect(content).toContain("router.push(`/trainings/${trainingId}`)");
+			expect(content).toMatch(
+				/router\.push\(`\/trainings\/\$\{trainingId\}`\)/,
+			);
 		});
 
 		it("should handle exercise selection for progress input", () => {
@@ -596,6 +596,29 @@ describe("Active Session Client Component", () => {
 			);
 			expect(content).toContain("selectedExerciseId ?");
 			expect(content).toContain("<ProgressInput");
+		});
+
+		it("should enable swipe gestures for exercise navigation", () => {
+			const fs = require("node:fs");
+			const content = fs.readFileSync(
+				`${__dirname}/../active-session.tsx`,
+				"utf-8",
+			);
+			expect(content).toContain("onTouchStart");
+			expect(content).toContain("onTouchMove");
+			expect(content).toContain("onTouchCancel");
+			expect(content).toContain("handleExerciseNavigation");
+			expect(content).toContain("touch-pan-y");
+		});
+
+		it("should show realtime connection status indicator", () => {
+			const fs = require("node:fs");
+			const content = fs.readFileSync(
+				`${__dirname}/../active-session.tsx`,
+				"utf-8",
+			);
+			expect(content).toContain("Realtime Online");
+			expect(content).toContain("realtimeStatus");
 		});
 
 		it("should have view toggle for active sessions", () => {

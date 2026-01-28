@@ -38,9 +38,11 @@ type MuscleGroup =
 	| "shoulders"
 	| "biceps"
 	| "triceps"
+	| "forearms"
 	| "abs"
 	| "quads"
 	| "hamstrings"
+	| "glutes"
 	| "calves";
 
 const EXERCISE_MUSCLE_MAP: Record<string, MuscleGroup[]> = {
@@ -174,7 +176,7 @@ function calculateMuscleProgress(
 /**
  * Get size classes based on size prop
  */
-function getSizeClasses(size: "sm" | "md" | "lg"): string {
+export function getSizeClasses(size: "sm" | "md" | "lg"): string {
 	const baseSize = "h-full w-full";
 	const containerSizes = {
 		sm: "h-32 w-24",
@@ -246,6 +248,11 @@ export function BodyProgress({
 		),
 		biceps: calculateMuscleProgress(completedExercises, exercises, "biceps"),
 		triceps: calculateMuscleProgress(completedExercises, exercises, "triceps"),
+		forearms: calculateMuscleProgress(
+			completedExercises,
+			exercises,
+			"forearms",
+		),
 		abs: calculateMuscleProgress(completedExercises, exercises, "abs"),
 		quads: calculateMuscleProgress(completedExercises, exercises, "quads"),
 		hamstrings: calculateMuscleProgress(
@@ -253,6 +260,7 @@ export function BodyProgress({
 			exercises,
 			"hamstrings",
 		),
+		glutes: calculateMuscleProgress(completedExercises, exercises, "glutes"),
 		calves: calculateMuscleProgress(completedExercises, exercises, "calves"),
 	};
 
@@ -269,6 +277,19 @@ export function BodyProgress({
 	const getScaleFactor = (progress: number): number => {
 		return 1 + progress * 0.003; // 0% -> 1.0, 100% -> 1.3
 	};
+
+	// Calculate overall body scale (thin to muscular)
+	const getBodyScale = (
+		progress: number,
+	): { scaleX: number; scaleY: number } => {
+		const clampedProgress = Math.max(0, Math.min(100, progress));
+		return {
+			scaleX: 0.9 + clampedProgress * 0.003, // 0% -> 0.9, 100% -> 1.2
+			scaleY: 0.96 + clampedProgress * 0.0008, // 0% -> 0.96, 100% -> 1.04
+		};
+	};
+
+	const bodyScale = getBodyScale(overallProgress);
 
 	if (exercisesLoading || progressLoading) {
 		return (
@@ -311,211 +332,218 @@ export function BodyProgress({
 							strokeWidth="0.5"
 						/>
 
-						{/* Torso */}
-						{/* Chest */}
-						<ellipse
-							cx="50"
-							cy="50"
-							rx={20 * getScaleFactor(muscleProgress.chest)}
-							ry={18 * getScaleFactor(muscleProgress.chest)}
-							fill={getProgressColor(muscleProgress.chest)}
-							fillOpacity={0.3 + muscleProgress.chest * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+						<g
+							className="transition-transform duration-700 ease-out"
+							style={{
+								transform: `translate(50px, 95px) scale(${bodyScale.scaleX}, ${bodyScale.scaleY}) translate(-50px, -95px)`,
+							}}
+						>
+							{/* Torso */}
+							{/* Chest */}
+							<ellipse
+								cx="50"
+								cy="50"
+								rx={20 * getScaleFactor(muscleProgress.chest)}
+								ry={18 * getScaleFactor(muscleProgress.chest)}
+								fill={getProgressColor(muscleProgress.chest)}
+								fillOpacity={0.3 + muscleProgress.chest * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Abs */}
-						<rect
-							x={50 - 12 * getScaleFactor(muscleProgress.abs)}
-							y="60"
-							width={24 * getScaleFactor(muscleProgress.abs)}
-							height={25 * getScaleFactor(muscleProgress.abs)}
-							rx="2"
-							fill={getProgressColor(muscleProgress.abs)}
-							fillOpacity={0.3 + muscleProgress.abs * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Abs */}
+							<rect
+								x={50 - 12 * getScaleFactor(muscleProgress.abs)}
+								y="60"
+								width={24 * getScaleFactor(muscleProgress.abs)}
+								height={25 * getScaleFactor(muscleProgress.abs)}
+								rx="2"
+								fill={getProgressColor(muscleProgress.abs)}
+								fillOpacity={0.3 + muscleProgress.abs * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Arms */}
-						{/* Left bicep */}
-						<ellipse
-							cx={25 - muscleProgress.biceps * 0.03}
-							cy="50"
-							rx={5 * getScaleFactor(muscleProgress.biceps)}
-							ry={8 * getScaleFactor(muscleProgress.biceps)}
-							fill={getProgressColor(muscleProgress.biceps)}
-							fillOpacity={0.3 + muscleProgress.biceps * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Arms */}
+							{/* Left bicep */}
+							<ellipse
+								cx={25 - muscleProgress.biceps * 0.03}
+								cy="50"
+								rx={5 * getScaleFactor(muscleProgress.biceps)}
+								ry={8 * getScaleFactor(muscleProgress.biceps)}
+								fill={getProgressColor(muscleProgress.biceps)}
+								fillOpacity={0.3 + muscleProgress.biceps * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right bicep */}
-						<ellipse
-							cx={75 + muscleProgress.biceps * 0.03}
-							cy="50"
-							rx={5 * getScaleFactor(muscleProgress.biceps)}
-							ry={8 * getScaleFactor(muscleProgress.biceps)}
-							fill={getProgressColor(muscleProgress.biceps)}
-							fillOpacity={0.3 + muscleProgress.biceps * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right bicep */}
+							<ellipse
+								cx={75 + muscleProgress.biceps * 0.03}
+								cy="50"
+								rx={5 * getScaleFactor(muscleProgress.biceps)}
+								ry={8 * getScaleFactor(muscleProgress.biceps)}
+								fill={getProgressColor(muscleProgress.biceps)}
+								fillOpacity={0.3 + muscleProgress.biceps * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Left tricep */}
-						<ellipse
-							cx={22 - muscleProgress.triceps * 0.03}
-							cy="55"
-							rx={4 * getScaleFactor(muscleProgress.triceps)}
-							ry={7 * getScaleFactor(muscleProgress.triceps)}
-							fill={getProgressColor(muscleProgress.triceps)}
-							fillOpacity={0.3 + muscleProgress.triceps * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Left tricep */}
+							<ellipse
+								cx={22 - muscleProgress.triceps * 0.03}
+								cy="55"
+								rx={4 * getScaleFactor(muscleProgress.triceps)}
+								ry={7 * getScaleFactor(muscleProgress.triceps)}
+								fill={getProgressColor(muscleProgress.triceps)}
+								fillOpacity={0.3 + muscleProgress.triceps * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right tricep */}
-						<ellipse
-							cx={78 + muscleProgress.triceps * 0.03}
-							cy="55"
-							rx={4 * getScaleFactor(muscleProgress.triceps)}
-							ry={7 * getScaleFactor(muscleProgress.triceps)}
-							fill={getProgressColor(muscleProgress.triceps)}
-							fillOpacity={0.3 + muscleProgress.triceps * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right tricep */}
+							<ellipse
+								cx={78 + muscleProgress.triceps * 0.03}
+								cy="55"
+								rx={4 * getScaleFactor(muscleProgress.triceps)}
+								ry={7 * getScaleFactor(muscleProgress.triceps)}
+								fill={getProgressColor(muscleProgress.triceps)}
+								fillOpacity={0.3 + muscleProgress.triceps * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Shoulders */}
-						{/* Left shoulder */}
-						<circle
-							cx={32 - muscleProgress.shoulders * 0.03}
-							cy="35"
-							r={5 * getScaleFactor(muscleProgress.shoulders)}
-							fill={getProgressColor(muscleProgress.shoulders)}
-							fillOpacity={0.3 + muscleProgress.shoulders * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Shoulders */}
+							{/* Left shoulder */}
+							<circle
+								cx={32 - muscleProgress.shoulders * 0.03}
+								cy="35"
+								r={5 * getScaleFactor(muscleProgress.shoulders)}
+								fill={getProgressColor(muscleProgress.shoulders)}
+								fillOpacity={0.3 + muscleProgress.shoulders * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right shoulder */}
-						<circle
-							cx={68 + muscleProgress.shoulders * 0.03}
-							cy="35"
-							r={5 * getScaleFactor(muscleProgress.shoulders)}
-							fill={getProgressColor(muscleProgress.shoulders)}
-							fillOpacity={0.3 + muscleProgress.shoulders * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right shoulder */}
+							<circle
+								cx={68 + muscleProgress.shoulders * 0.03}
+								cy="35"
+								r={5 * getScaleFactor(muscleProgress.shoulders)}
+								fill={getProgressColor(muscleProgress.shoulders)}
+								fillOpacity={0.3 + muscleProgress.shoulders * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Forearms */}
-						<rect
-							x={20 - muscleProgress.biceps * 0.02}
-							y="58"
-							width="4"
-							height="20"
-							rx="2"
-							fill="#f5d0b0"
-							stroke="#d4a574"
-							strokeWidth="0.5"
-						/>
-						<rect
-							x={76 + muscleProgress.biceps * 0.02}
-							y="58"
-							width="4"
-							height="20"
-							rx="2"
-							fill="#f5d0b0"
-							stroke="#d4a574"
-							strokeWidth="0.5"
-						/>
+							{/* Forearms */}
+							<rect
+								x={20 - muscleProgress.biceps * 0.02}
+								y="58"
+								width="4"
+								height="20"
+								rx="2"
+								fill="#f5d0b0"
+								stroke="#d4a574"
+								strokeWidth="0.5"
+							/>
+							<rect
+								x={76 + muscleProgress.biceps * 0.02}
+								y="58"
+								width="4"
+								height="20"
+								rx="2"
+								fill="#f5d0b0"
+								stroke="#d4a574"
+								strokeWidth="0.5"
+							/>
 
-						{/* Hands */}
-						<circle
-							cx="22"
-							cy="80"
-							r="3"
-							fill="#f5d0b0"
-							stroke="#d4a574"
-							strokeWidth="0.5"
-						/>
-						<circle
-							cx="78"
-							cy="80"
-							r="3"
-							fill="#f5d0b0"
-							stroke="#d4a574"
-							strokeWidth="0.5"
-						/>
+							{/* Hands */}
+							<circle
+								cx="22"
+								cy="80"
+								r="3"
+								fill="#f5d0b0"
+								stroke="#d4a574"
+								strokeWidth="0.5"
+							/>
+							<circle
+								cx="78"
+								cy="80"
+								r="3"
+								fill="#f5d0b0"
+								stroke="#d4a574"
+								strokeWidth="0.5"
+							/>
 
-						{/* Legs */}
-						{/* Left quad */}
-						<rect
-							x={35 - muscleProgress.quads * 0.04}
-							y="85"
-							width={10 * getScaleFactor(muscleProgress.quads)}
-							height={35 * getScaleFactor(muscleProgress.quads)}
-							rx="3"
-							fill={getProgressColor(muscleProgress.quads)}
-							fillOpacity={0.3 + muscleProgress.quads * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Legs */}
+							{/* Left quad */}
+							<rect
+								x={35 - muscleProgress.quads * 0.04}
+								y="85"
+								width={10 * getScaleFactor(muscleProgress.quads)}
+								height={35 * getScaleFactor(muscleProgress.quads)}
+								rx="3"
+								fill={getProgressColor(muscleProgress.quads)}
+								fillOpacity={0.3 + muscleProgress.quads * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right quad */}
-						<rect
-							x={55 + muscleProgress.quads * 0.04}
-							y="85"
-							width={10 * getScaleFactor(muscleProgress.quads)}
-							height={35 * getScaleFactor(muscleProgress.quads)}
-							rx="3"
-							fill={getProgressColor(muscleProgress.quads)}
-							fillOpacity={0.3 + muscleProgress.quads * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right quad */}
+							<rect
+								x={55 + muscleProgress.quads * 0.04}
+								y="85"
+								width={10 * getScaleFactor(muscleProgress.quads)}
+								height={35 * getScaleFactor(muscleProgress.quads)}
+								rx="3"
+								fill={getProgressColor(muscleProgress.quads)}
+								fillOpacity={0.3 + muscleProgress.quads * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Left hamstring */}
-						<rect
-							x={36 - muscleProgress.hamstrings * 0.03}
-							y="95"
-							width={6 * getScaleFactor(muscleProgress.hamstrings)}
-							height={20 * getScaleFactor(muscleProgress.hamstrings)}
-							rx="2"
-							fill={getProgressColor(muscleProgress.hamstrings)}
-							fillOpacity={0.3 + muscleProgress.hamstrings * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Left hamstring */}
+							<rect
+								x={36 - muscleProgress.hamstrings * 0.03}
+								y="95"
+								width={6 * getScaleFactor(muscleProgress.hamstrings)}
+								height={20 * getScaleFactor(muscleProgress.hamstrings)}
+								rx="2"
+								fill={getProgressColor(muscleProgress.hamstrings)}
+								fillOpacity={0.3 + muscleProgress.hamstrings * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right hamstring */}
-						<rect
-							x={58 + muscleProgress.hamstrings * 0.03}
-							y="95"
-							width={6 * getScaleFactor(muscleProgress.hamstrings)}
-							height={20 * getScaleFactor(muscleProgress.hamstrings)}
-							rx="2"
-							fill={getProgressColor(muscleProgress.hamstrings)}
-							fillOpacity={0.3 + muscleProgress.hamstrings * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right hamstring */}
+							<rect
+								x={58 + muscleProgress.hamstrings * 0.03}
+								y="95"
+								width={6 * getScaleFactor(muscleProgress.hamstrings)}
+								height={20 * getScaleFactor(muscleProgress.hamstrings)}
+								rx="2"
+								fill={getProgressColor(muscleProgress.hamstrings)}
+								fillOpacity={0.3 + muscleProgress.hamstrings * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Calves */}
-						{/* Left calf */}
-						<ellipse
-							cx="40"
-							cy={140 + muscleProgress.calves * 0.02}
-							rx={5 * getScaleFactor(muscleProgress.calves)}
-							ry={12 * getScaleFactor(muscleProgress.calves)}
-							fill={getProgressColor(muscleProgress.calves)}
-							fillOpacity={0.3 + muscleProgress.calves * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Calves */}
+							{/* Left calf */}
+							<ellipse
+								cx="40"
+								cy={140 + muscleProgress.calves * 0.02}
+								rx={5 * getScaleFactor(muscleProgress.calves)}
+								ry={12 * getScaleFactor(muscleProgress.calves)}
+								fill={getProgressColor(muscleProgress.calves)}
+								fillOpacity={0.3 + muscleProgress.calves * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Right calf */}
-						<ellipse
-							cx="60"
-							cy={140 + muscleProgress.calves * 0.02}
-							rx={5 * getScaleFactor(muscleProgress.calves)}
-							ry={12 * getScaleFactor(muscleProgress.calves)}
-							fill={getProgressColor(muscleProgress.calves)}
-							fillOpacity={0.3 + muscleProgress.calves * 0.007}
-							className="transition-all duration-700 ease-out"
-						/>
+							{/* Right calf */}
+							<ellipse
+								cx="60"
+								cy={140 + muscleProgress.calves * 0.02}
+								rx={5 * getScaleFactor(muscleProgress.calves)}
+								ry={12 * getScaleFactor(muscleProgress.calves)}
+								fill={getProgressColor(muscleProgress.calves)}
+								fillOpacity={0.3 + muscleProgress.calves * 0.007}
+								className="transition-all duration-700 ease-out"
+							/>
 
-						{/* Feet */}
-						<ellipse cx="40" cy="165" rx="6" ry="4" fill="#333" />
-						<ellipse cx="60" cy="165" rx="6" ry="4" fill="#333" />
+							{/* Feet */}
+							<ellipse cx="40" cy="165" rx="6" ry="4" fill="#333" />
+							<ellipse cx="60" cy="165" rx="6" ry="4" fill="#333" />
+						</g>
 					</svg>
 				</div>
 

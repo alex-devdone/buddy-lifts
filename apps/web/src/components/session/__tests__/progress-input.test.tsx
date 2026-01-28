@@ -16,8 +16,6 @@
  * - Code quality (naming, organization)
  */
 
-import { describe, expect, it, vi } from "vitest";
-
 // Mock the env package before any imports
 vi.mock("@buddy-lifts/env/web", () => ({
 	env: {

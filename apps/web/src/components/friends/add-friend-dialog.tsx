@@ -29,8 +29,8 @@ export interface UserSearchResult {
 
 export interface ExistingFriend {
 	id: string;
-	userId: string;
-	friendId: string;
+	user_id: string;
+	friend_id: string;
 	status: "pending" | "accepted" | "blocked";
 }
 
@@ -109,7 +109,7 @@ export function AddFriendDialog({
 		useSupabaseQuery<UserSearchResult>({
 			queryFn: (supabase) => {
 				if (!debouncedQuery || !currentUserId) {
-					return { data: [], error: null };
+					return Promise.resolve({ data: [], error: null });
 				}
 
 				return supabase
@@ -119,7 +119,6 @@ export function AddFriendDialog({
 					.neq("id", currentUserId) // Exclude current user
 					.limit(10);
 			},
-			enabled: !!currentUserId && debouncedQuery.length >= 2,
 			realtime: false,
 		});
 
@@ -127,7 +126,7 @@ export function AddFriendDialog({
 	const { data: existingFriends = [] } = useSupabaseQuery<ExistingFriend>({
 		queryFn: (supabase) => {
 			if (!currentUserId) {
-				return { data: [], error: null };
+				return Promise.resolve({ data: [], error: null });
 			}
 
 			return supabase
@@ -135,7 +134,6 @@ export function AddFriendDialog({
 				.select("id, user_id, friend_id, status")
 				.or(`user_id.eq.${currentUserId},friend_id.eq.${currentUserId}`);
 		},
-		enabled: !!currentUserId,
 		realtime: true,
 		table: "friend",
 	});
@@ -161,8 +159,8 @@ export function AddFriendDialog({
 		(userId: string): "none" | "pending" | "accepted" | "blocked" => {
 			const relationship = existingFriends.find(
 				(f) =>
-					(f.userId === currentUserId && f.friendId === userId) ||
-					(f.userId === userId && f.friendId === currentUserId),
+					(f.user_id === currentUserId && f.friend_id === userId) ||
+					(f.user_id === userId && f.friend_id === currentUserId),
 			);
 
 			if (!relationship) return "none";

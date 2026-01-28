@@ -1,4 +1,16 @@
-import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+
+const exerciseChecklistPath =
+	"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx";
+const readExerciseChecklistFile = () =>
+	readFileSync(exerciseChecklistPath, "utf-8");
+
+if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
+	process.env.NEXT_PUBLIC_SUPABASE_URL = "http://localhost:54321";
+}
+if (!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+	process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY = "test-anon-key";
+}
 
 /**
  * Structural tests for ExerciseChecklist component
@@ -29,18 +41,12 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should use client directive", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 		expect(fileContent).toContain('"use client"');
 	});
 
 	test("should have correct interface definitions", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("interface ExerciseChecklistProps");
 		expect(fileContent).toContain("interface Exercise");
@@ -49,10 +55,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have required props in interface", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("sessionId:");
 		expect(fileContent).toContain("userId:");
@@ -62,10 +65,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should reference required dependencies", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Verify uses Supabase query hook
 		expect(fileContent).toContain("useSupabaseQuery");
@@ -84,17 +84,14 @@ describe("ExerciseChecklist Component", () => {
 		expect(fileContent).toContain("CheckCircle2");
 		expect(fileContent).toContain("Circle");
 		expect(fileContent).toContain("Dumbbell");
-		expect(fileContent).toContain("Loader2");
+		expect(fileContent).toContain("ExerciseChecklistSkeleton");
 
 		// Verify uses toast for notifications
 		expect(fileContent).toContain("toast");
 	});
 
 	test("should fetch from exercise table", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("exercise");
 		expect(fileContent).toContain('eq("trainingId"');
@@ -102,10 +99,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should fetch from exercise_progress table", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("exercise_progress");
 		expect(fileContent).toContain('eq("sessionId"');
@@ -113,10 +107,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should use real-time subscriptions", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("realtime: true");
 		expect(fileContent).toContain('table: "exercise"');
@@ -124,10 +115,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have progress map for quick lookup", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("progressMap");
 		expect(fileContent).toContain("new Map");
@@ -135,10 +123,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should combine exercises with progress status", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("exercisesWithProgress");
 		expect(fileContent).toContain("isCompleted");
@@ -146,10 +131,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have tRPC mutations for progress management", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("recordProgress");
 		expect(fileContent).toContain("deleteProgress");
@@ -158,24 +140,18 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should handle checkbox changes", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("handleCheckboxChange");
 		expect(fileContent).toContain("useCallback");
 	});
 
 	test("should mark exercise as complete with target reps", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("Array(exercise.targetSets)");
 		expect(fileContent).toContain("exercise.targetReps");
-		expect(fileContent).toContain("JSON.stringify");
+		expect(fileContent).toContain("completedReps");
 	});
 
 	test("should calculate completion stats", async () => {
@@ -188,32 +164,22 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have loading state", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("exercisesLoading");
 		expect(fileContent).toContain("progressLoading");
-		expect(fileContent).toContain("Loader2");
-		expect(fileContent).toContain("animate-spin");
+		expect(fileContent).toContain("ExerciseChecklistSkeleton");
 	});
 
 	test("should have empty state when no exercises", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("exercises.length === 0");
 		expect(fileContent).toContain("No exercises yet");
 	});
 
 	test("should display exercise details correctly", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Check for exercise name display
 		expect(fileContent).toContain("exercise.name");
@@ -233,10 +199,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have completion icon indicators", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("CheckCircle2");
 		expect(fileContent).toContain("Circle");
@@ -245,10 +208,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have styling for completed exercises", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("border-green-500/30");
 		expect(fileContent).toContain("bg-green-500/5");
@@ -256,20 +216,14 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have styling for incomplete exercises", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("border-border");
 		expect(fileContent).toContain("bg-card");
 	});
 
 	test("should support overlay mode for body visualization", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("showBodyOverlay");
 		expect(fileContent).toContain("backdrop-blur-sm");
@@ -277,20 +231,14 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have proper ARIA labels for accessibility", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("aria-label");
-		expect(fileContent).toContain("Mark ${exercise.name} as");
+		expect(fileContent).toMatch(/Mark \$\{exercise\.name\} as/);
 	});
 
 	test("should disable checkbox during mutations", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("disabled");
 		expect(fileContent).toContain("recordProgress.isPending");
@@ -298,23 +246,18 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should show toast notifications", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Toast is still used for error notifications in optimistic update callbacks
 		expect(fileContent).toContain("toast.error");
+		expect(fileContent).toContain("toast.success");
 		// Check for optimistic update state management
 		expect(fileContent).toContain("setOptimisticUpdates");
 		expect(fileContent).toContain("optimisticUpdates");
 	});
 
 	test("should display completion stats in header", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("Exercises");
 		expect(fileContent).toContain("Dumbbell");
@@ -322,29 +265,20 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have green text for 100% completion", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("completionPercentage === 100");
 		expect(fileContent).toContain("text-green-500");
 	});
 
 	test("should use cn utility for className merging", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("cn(");
 	});
 
 	test("should be mobile-first responsive", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Check for responsive gap classes
 		expect(fileContent).toContain("gap-3");
@@ -365,10 +299,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have ExerciseWithProgress interface extending Exercise", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("interface ExerciseWithProgress");
 		expect(fileContent).toContain("progress?: ExerciseProgress");
@@ -384,10 +315,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have proper TypeScript types", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Check for proper type annotations
 		expect(fileContent).toContain(": string");
@@ -397,10 +325,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should use flexbox for layout", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("flex flex-col");
 		expect(fileContent).toContain("flex items-center");
@@ -408,10 +333,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should have proper component JSDoc comment", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("/**");
 		expect(fileContent).toContain("ExerciseChecklist Component");
@@ -419,30 +341,21 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should handle group hover and transition effects", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("group");
 		expect(fileContent).toContain("transition-colors");
 	});
 
 	test("should filter exercises by trainingId", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		expect(fileContent).toContain("trainingId");
 		expect(fileContent).toContain(".eq(");
 	});
 
 	test("should implement optimistic updates for progress recording", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Should have optimistic state management
 		expect(fileContent).toContain("useState");
@@ -470,10 +383,7 @@ describe("ExerciseChecklist Component", () => {
 	});
 
 	test("should show visual feedback for optimistic updates", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/exercise-checklist.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readExerciseChecklistFile();
 
 		// Should have animate-pulse class for optimistic updates
 		expect(fileContent).toContain("animate-pulse");

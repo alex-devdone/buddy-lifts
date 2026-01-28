@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/app/trainings/new/__tests__/page.test.tsx
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("New Training Page Component", () => {
 	describe("Component Structure", () => {
 		it("should export the page component", () => {

@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/friends/__tests__/add-friend-dialog.test.ts
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("AddFriendDialog Component", () => {
 	describe("Component Structure", () => {
 		it("should export the component", () => {
@@ -79,8 +77,8 @@ describe("AddFriendDialog Component", () => {
 		it("should have proper TypeScript types for ExistingFriend", () => {
 			const friend: import("../add-friend-dialog").ExistingFriend = {
 				id: "friend-1",
-				userId: "user-1",
-				friendId: "user-2",
+				user_id: "user-1",
+				friend_id: "user-2",
 				status: "accepted",
 			};
 			expect(friend.status).toBe("accepted");
@@ -535,8 +533,8 @@ describe("AddFriendDialog Component", () => {
 				`${__dirname}/../add-friend-dialog.tsx`,
 				"utf-8",
 			);
-			expect(content).toContain("f.userId === currentUserId");
-			expect(content).toContain("f.userId === userId");
+			expect(content).toContain("f.user_id === currentUserId");
+			expect(content).toContain("f.user_id === userId");
 		});
 
 		it("should display correct status labels", () => {
@@ -598,7 +596,7 @@ describe("AddFriendDialog Component", () => {
 				`${__dirname}/../add-friend-dialog.tsx`,
 				"utf-8",
 			);
-			expect(content).toContain("!!currentUserId");
+			expect(content).toContain("!currentUserId");
 		});
 	});
 

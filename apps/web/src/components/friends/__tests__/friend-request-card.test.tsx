@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/friends/__tests__/friend-request-card.test.ts
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("FriendRequestCard Component", () => {
 	describe("Component Structure", () => {
 		it("should export the component", () => {

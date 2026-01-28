@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertCircle, Dumbbell, Loader2, Users } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect } from "react";
 import { toast } from "sonner";
 
@@ -30,6 +30,10 @@ export function JoinPageClient({
 	inviteCode,
 }: Omit<JoinPageClientProps, "currentUserId">) {
 	const router = useRouter();
+	const searchParams = useSearchParams();
+	const accessParam = searchParams.get("access");
+	const accessType =
+		accessParam === "read" || accessParam === "admin" ? accessParam : undefined;
 
 	// tRPC mutation for joining session (write operation)
 	// biome-ignore lint/suspicious/noExplicitAny: tRPC type inference issue with useMutation
@@ -69,10 +73,9 @@ export function JoinPageClient({
 	});
 
 	// Automatically join the session when component mounts
-	// biome-ignore lint/correctness/useExhaustiveDependencies: joinMutation.mutate is stable
 	useEffect(() => {
-		joinMutation.mutate({ inviteCode });
-	}, [inviteCode, joinMutation.mutate]);
+		joinMutation.mutate({ inviteCode, accessType });
+	}, [inviteCode, joinMutation.mutate, accessType]);
 
 	return (
 		<Card className="w-full max-w-md">

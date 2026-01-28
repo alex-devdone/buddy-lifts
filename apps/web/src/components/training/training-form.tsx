@@ -3,6 +3,7 @@
 import { useForm } from "@tanstack/react-form";
 import { useMutation } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +26,11 @@ interface TrainingFormProps {
 	onCancel?: () => void;
 }
 
+interface TrainingCreateWithExercisesResponse {
+	training: Training;
+	count: number;
+}
+
 export function TrainingForm({
 	training,
 	onSuccess,
@@ -32,14 +38,16 @@ export function TrainingForm({
 }: TrainingFormProps) {
 	const router = useRouter();
 	const isEditing = !!training;
+	const [exerciseInput, setExerciseInput] = useState("");
 
 	const createTraining = useMutation(
 		trpc.training.create.mutationOptions({
 			onSuccess: (data) => {
+				const trainingData = data as Training;
 				toast.success("Training created successfully");
-				onSuccess?.(data as Training);
+				onSuccess?.(trainingData);
 				if (!onSuccess) {
-					router.push(`/trainings/${data.id}` as any);
+					router.push(`/trainings/${trainingData.id}`);
 				}
 			},
 			onError: (error) => {
@@ -55,6 +63,23 @@ export function TrainingForm({
 				onSuccess?.(data as Training);
 				if (!onSuccess) {
 					router.back();
+				}
+			},
+			onError: (error) => {
+				toast.error(error.message);
+			},
+		}),
+	);
+
+	const createTrainingWithExercises = useMutation(
+		trpc.training.createWithExercises.mutationOptions({
+			onSuccess: (data) => {
+				const trainingData = (data as TrainingCreateWithExercisesResponse)
+					.training;
+				toast.success("Training created with exercises");
+				onSuccess?.(trainingData);
+				if (!onSuccess) {
+					router.push(`/trainings/${trainingData.id}`);
 				}
 			},
 			onError: (error) => {
@@ -80,12 +105,23 @@ export function TrainingForm({
 					...value,
 				});
 			} else {
-				createTraining.mutate(value);
+				if (exerciseInput.trim()) {
+					createTrainingWithExercises.mutate({
+						...value,
+						input: exerciseInput,
+					});
+				} else {
+					createTraining.mutate(value);
+				}
 			}
 		},
 	});
 
-	const isPending = createTraining.isPending || updateTraining.isPending;
+	const isPending =
+		createTraining.isPending ||
+		updateTraining.isPending ||
+		createTrainingWithExercises.isPending;
+	const isAiCreate = !isEditing && exerciseInput.trim().length > 0;
 
 	return (
 		<div className="mx-auto w-full max-w-md p-4">
@@ -141,6 +177,26 @@ export function TrainingForm({
 					</form.Field>
 				</div>
 
+				{!isEditing && (
+					<div className="space-y-2">
+						<Label htmlFor="exerciseInput">
+							Workout (Natural Language, Optional)
+						</Label>
+						<Textarea
+							id="exerciseInput"
+							name="exerciseInput"
+							placeholder="e.g., 10x4 pushup, 3x12 bench press, 5x5 squat"
+							value={exerciseInput}
+							onChange={(e) => setExerciseInput(e.target.value)}
+							disabled={isPending}
+							rows={4}
+						/>
+						<p className="text-muted-foreground text-xs">
+							We will parse this into exercises when creating your training.
+						</p>
+					</div>
+				)}
+
 				<form.Subscribe>
 					{(state) => (
 						<div className="flex gap-2">
@@ -153,7 +209,9 @@ export function TrainingForm({
 									? "Saving..."
 									: isEditing
 										? "Update Training"
-										: "Create Training"}
+										: isAiCreate
+											? "Create Training + Exercises"
+											: "Create Training"}
 							</Button>
 							{onCancel && (
 								<Button

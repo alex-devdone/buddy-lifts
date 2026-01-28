@@ -60,7 +60,9 @@ export function InviteLinkDialog({
 	onOpenChange,
 }: InviteLinkDialogProps) {
 	const [uncontrolledOpen, setUncontrolledOpen] = useState(false);
-	const [copied, setCopied] = useState(false);
+	const [copiedTarget, setCopiedTarget] = useState<
+		"code" | "read" | "admin" | null
+	>(null);
 
 	// Use controlled or uncontrolled state
 	const isOpen = controlledOpen ?? uncontrolledOpen;
@@ -77,7 +79,7 @@ export function InviteLinkDialog({
 				.from("training_session")
 				.select("*")
 				.eq("id", sessionId)
-				.single(),
+				.limit(1),
 		realtime: true,
 		table: "training_session",
 	});
@@ -114,45 +116,52 @@ export function InviteLinkDialog({
 	}, []);
 
 	// Determine if current user is host
-	const isHost = currentUserId && sessionData?.hostUserId === currentUserId;
+	const session = sessionData?.[0];
+	const isHost = currentUserId && session?.hostUserId === currentUserId;
 
 	// Generate invite URL
-	const inviteUrl = sessionData?.inviteCode
-		? `${typeof window !== "undefined" ? window.location.origin : ""}/join/${sessionData.inviteCode}`
+	const inviteBaseUrl = session?.inviteCode
+		? `${typeof window !== "undefined" ? window.location.origin : ""}/join/${session.inviteCode}`
 		: "";
+	const readInviteUrl = inviteBaseUrl ? `${inviteBaseUrl}?access=read` : "";
+	const adminInviteUrl = inviteBaseUrl ? `${inviteBaseUrl}?access=admin` : "";
 
 	// Copy invite link to clipboard
-	const handleCopyInviteLink = useCallback(() => {
-		if (!inviteUrl) return;
+	const handleCopyInviteLink = useCallback(
+		(accessType: "read" | "admin") => {
+			const linkToCopy = accessType === "read" ? readInviteUrl : adminInviteUrl;
+			if (!linkToCopy) return;
 
-		navigator.clipboard.writeText(inviteUrl).then(() => {
-			setCopied(true);
-			toast.success("Invite link copied!");
-			setTimeout(() => setCopied(false), 2000);
-		});
-	}, [inviteUrl]);
+			navigator.clipboard.writeText(linkToCopy).then(() => {
+				setCopiedTarget(accessType);
+				toast.success("Invite link copied!");
+				setTimeout(() => setCopiedTarget(null), 2000);
+			});
+		},
+		[adminInviteUrl, readInviteUrl],
+	);
 
 	// Copy invite code only
 	const handleCopyInviteCode = useCallback(() => {
-		if (!sessionData?.inviteCode) return;
+		if (!session?.inviteCode) return;
 
-		navigator.clipboard.writeText(sessionData.inviteCode).then(() => {
-			setCopied(true);
+		navigator.clipboard.writeText(session.inviteCode).then(() => {
+			setCopiedTarget("code");
 			toast.success("Invite code copied!");
-			setTimeout(() => setCopied(false), 2000);
+			setTimeout(() => setCopiedTarget(null), 2000);
 		});
-	}, [sessionData?.inviteCode]);
+	}, [session?.inviteCode]);
 
 	// Toggle access type
 	const handleToggleAccess = useCallback(() => {
-		if (!sessionData) return;
+		if (!session) return;
 
-		const newAccessType = sessionData.accessType === "read" ? "admin" : "read";
+		const newAccessType = session.accessType === "read" ? "admin" : "read";
 		updateAccess.mutate({
 			sessionId,
 			accessType: newAccessType,
 		});
-	}, [sessionData, sessionId, updateAccess]);
+	}, [session, sessionId, updateAccess]);
 
 	// Default trigger button
 	const defaultTrigger = (
@@ -171,7 +180,7 @@ export function InviteLinkDialog({
 		);
 	}
 
-	if (sessionError || !sessionData) {
+	if (sessionError || !session) {
 		return (
 			<Button variant="outline" size="sm" disabled>
 				Session unavailable
@@ -186,8 +195,8 @@ export function InviteLinkDialog({
 				<DialogHeader>
 					<DialogTitle>Share Invite Link</DialogTitle>
 					<DialogDescription>
-						Share this invite link with friends to let them join your training
-						session.
+						Share read-only or admin invite links to let friends join your
+						training session.
 					</DialogDescription>
 				</DialogHeader>
 
@@ -200,7 +209,7 @@ export function InviteLinkDialog({
 						<div className="flex items-center gap-2">
 							<div className="flex flex-1 items-center rounded-md border bg-muted px-3 py-2">
 								<span className="font-bold font-mono text-sm">
-									{sessionData.inviteCode}
+									{session.inviteCode}
 								</span>
 							</div>
 							<Button
@@ -219,27 +228,60 @@ export function InviteLinkDialog({
 					{/* Invite URL Display */}
 					<div className="space-y-2">
 						<span className="font-medium text-muted-foreground text-xs">
-							Full Invite Link
+							Invite Links
 						</span>
-						<div className="rounded-md border bg-muted p-3">
-							<p className="break-all font-mono text-xs">{inviteUrl}</p>
+						<div className="space-y-3">
+							<div className="rounded-md border bg-muted p-3">
+								<div className="flex items-center justify-between gap-3">
+									<div className="space-y-1">
+										<p className="font-medium text-xs">Read-only link</p>
+										<p className="break-all font-mono text-[11px]">
+											{readInviteUrl}
+										</p>
+									</div>
+									<Button
+										variant={copiedTarget === "read" ? "default" : "outline"}
+										size="sm"
+										onClick={() => handleCopyInviteLink("read")}
+										aria-label="Copy read-only invite link"
+									>
+										{copiedTarget === "read" ? (
+											<>Copied!</>
+										) : (
+											<>
+												<Copy className="mr-1 h-4 w-4" />
+												Copy
+											</>
+										)}
+									</Button>
+								</div>
+							</div>
+							<div className="rounded-md border bg-muted p-3">
+								<div className="flex items-center justify-between gap-3">
+									<div className="space-y-1">
+										<p className="font-medium text-xs">Admin link</p>
+										<p className="break-all font-mono text-[11px]">
+											{adminInviteUrl}
+										</p>
+									</div>
+									<Button
+										variant={copiedTarget === "admin" ? "default" : "outline"}
+										size="sm"
+										onClick={() => handleCopyInviteLink("admin")}
+										aria-label="Copy admin invite link"
+									>
+										{copiedTarget === "admin" ? (
+											<>Copied!</>
+										) : (
+											<>
+												<Copy className="mr-1 h-4 w-4" />
+												Copy
+											</>
+										)}
+									</Button>
+								</div>
+							</div>
 						</div>
-						<Button
-							variant={copied ? "default" : "outline"}
-							size="sm"
-							onClick={handleCopyInviteLink}
-							className="w-full"
-							aria-label="Copy invite link"
-						>
-							{copied ? (
-								<>Copied!</>
-							) : (
-								<>
-									<Copy className="mr-1 h-4 w-4" />
-									Copy Link
-								</>
-							)}
-						</Button>
 					</div>
 
 					{/* Access Type Toggle - Host Only */}
@@ -254,9 +296,9 @@ export function InviteLinkDialog({
 								onClick={handleToggleAccess}
 								disabled={updateAccess.isPending}
 								className="w-full justify-start"
-								aria-label={`Change access type. Currently: ${sessionData.accessType}`}
+								aria-label={`Change access type. Currently: ${session.accessType}`}
 							>
-								{sessionData.accessType === "read" ? (
+								{session.accessType === "read" ? (
 									<>
 										<Lock className="mr-2 h-4 w-4" />
 										Read Only - Participants can view but not modify
@@ -277,7 +319,7 @@ export function InviteLinkDialog({
 							<p className="text-muted-foreground text-xs">
 								Current access level:{" "}
 								<span className="font-medium capitalize">
-									{sessionData.accessType}
+									{session.accessType}
 								</span>
 								. Only the host can change this setting.
 							</p>

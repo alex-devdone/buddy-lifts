@@ -15,7 +15,7 @@ interface ParticipantJoinPayload {
 	record: {
 		id: string;
 		sessionId: string;
-		odUserId: string;
+		userId: string;
 		role: string;
 		joinedAt: string;
 	} & Record<string, unknown>;
@@ -47,11 +47,21 @@ serve(async (req) => {
 
 		const { record } = payload;
 		const sessionId = record.sessionId as string;
-		const newParticipantId = record.odUserId as string;
+		const newParticipantId = record.userId as string;
 
 		// Initialize Supabase client
-		const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-		const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+		const supabaseUrl = Deno.env.get("SUPABASE_URL");
+		const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+		if (!supabaseUrl || !supabaseServiceKey) {
+			console.error("Missing Supabase environment variables");
+			return new Response(
+				JSON.stringify({ error: "Supabase environment variables not set" }),
+				{
+					status: 500,
+					headers: { ...corsHeaders, "Content-Type": "application/json" },
+				},
+			);
+		}
 		const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 		// Fetch session details to get the host info

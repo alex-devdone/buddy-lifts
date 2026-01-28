@@ -38,13 +38,13 @@ rules:
 
 # Boundaries - files/folders the AI should not modify
 boundaries:
-  - "node_modules/**"
-  - "*.lock"
-  - "bun.lockb"
-  - ".next/**"
-  - "dist/**"
-  - ".turbo/**"
-  - ".git/**"
-  - "apps/web/.env*"
-  - "*.env"
-  - "*.env.local"
+  node_modules: "node_modules/**"
+  lock_files: "*.lock"
+  bun_lock: "bun.lockb"
+  next: ".next/**"
+  dist: "dist/**"
+  turbo: ".turbo/**"
+  git: ".git/**"
+  env_files: "apps/web/.env*"
+  env: "*.env"
+  env_local: "*.env.local"

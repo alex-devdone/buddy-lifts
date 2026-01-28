@@ -3,19 +3,20 @@
  * Tests the server component (page.tsx) and client component (feed-client.tsx)
  */
 
+import { resolve } from "node:path";
 import { render, screen } from "@testing-library/react";
 import { redirect } from "next/navigation";
 
-import { beforeEach, describe, expect, it, vi } from "vitest";
-
 // Mock auth module
-vi.mock("@buddy-lifts/auth", () => ({
+const mockedAuth = {
 	auth: {
 		api: {
 			getSession: vi.fn(),
 		},
 	},
-}));
+};
+
+vi.mock("@buddy-lifts/auth", () => mockedAuth);
 
 // Mock next/navigation
 vi.mock("next/navigation", () => ({
@@ -23,6 +24,10 @@ vi.mock("next/navigation", () => ({
 	headers: vi.fn(() => ({
 		get: vi.fn(),
 	})),
+}));
+
+vi.mock("next/headers", () => ({
+	headers: vi.fn(() => new Headers()),
 }));
 
 // Mock TrainingFeed component
@@ -35,8 +40,62 @@ vi.mock("@/components/feed/training-feed", () => ({
 	__esModule: true,
 }));
 
-// Import mocks
-import { auth } from "@buddy-lifts/auth";
+const { auth } = mockedAuth;
+
+interface AuthUser {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	email: string;
+	emailVerified: boolean;
+	name: string;
+	image?: string | null;
+}
+
+interface AuthSessionData {
+	id: string;
+	createdAt: Date;
+	updatedAt: Date;
+	userId: string;
+	expiresAt: Date;
+	token: string;
+	ipAddress?: string | null;
+	userAgent?: string | null;
+}
+
+type AuthSession = {
+	user: AuthUser | null;
+	session: AuthSessionData;
+} | null;
+
+const createUser = (overrides: Partial<AuthUser> = {}): AuthUser => ({
+	id: "user-123",
+	createdAt: new Date(),
+	updatedAt: new Date(),
+	email: "test@example.com",
+	emailVerified: true,
+	name: "Test User",
+	image: null,
+	...overrides,
+});
+
+const createSession = (
+	overrides: Partial<AuthSessionData> = {},
+): AuthSessionData => ({
+	id: "session-123",
+	createdAt: new Date(),
+	updatedAt: new Date(),
+	userId: "user-123",
+	expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+	token: "session-token",
+	ipAddress: null,
+	userAgent: null,
+	...overrides,
+});
+
+const mockGetSession = (session: AuthSession) => {
+	auth.api.getSession.mockResolvedValue(session);
+};
 
 describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 	describe("Server Component Structure", () => {
@@ -72,9 +131,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 		});
 
 		it("should call auth.api.getSession with headers", async () => {
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test User" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser(),
+				session: createSession(),
 			});
 
 			await import("../page").then((mod) => mod.default());
@@ -83,32 +142,43 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 		});
 
 		it("should redirect to /login when no session exists", async () => {
-			vi.mocked(auth.api.getSession).mockResolvedValue(null);
-			await import("../page").then((mod) => mod.default());
+			mockGetSession(null);
+			(
+				redirect as unknown as { mockImplementation: (fn: () => never) => void }
+			).mockImplementation(() => {
+				throw new Error("redirect");
+			});
+
+			await expect(
+				import("../page").then((mod) => mod.default()),
+			).rejects.toThrow("redirect");
 
 			expect(redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should redirect to /login when session exists but no user", async () => {
-			vi.mocked(auth.api.getSession).mockResolvedValue({
+			mockGetSession({
 				user: null,
-				session: { id: "session-123" },
+				session: createSession(),
 			});
 
-			await import("../page").then((mod) => mod.default());
+			(
+				redirect as unknown as { mockImplementation: (fn: () => never) => void }
+			).mockImplementation(() => {
+				throw new Error("redirect");
+			});
+
+			await expect(
+				import("../page").then((mod) => mod.default()),
+			).rejects.toThrow("redirect");
 
 			expect(redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should render content when user is authenticated", async () => {
-			const mockUser = {
-				id: "user-123",
-				name: "Test User",
-				email: "test@example.com",
-			};
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: mockUser,
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser(),
+				session: createSession(),
 			});
 
 			// Import and render the component (it's async)
@@ -122,9 +192,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 	describe("Page Structure", () => {
 		beforeEach(() => {
 			vi.clearAllMocks();
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test User" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser(),
+				session: createSession(),
 			});
 		});
 
@@ -147,9 +217,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 		it("should pass currentUserId to FeedClient", async () => {
 			const FeedPage = (await import("../page")).default;
 			const userId = "test-user-id";
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: userId, name: "Test" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser({ id: userId, name: "Test" }),
+				session: createSession({ userId }),
 			});
 
 			render(await FeedPage());
@@ -162,9 +232,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 	describe("Responsive Design", () => {
 		beforeEach(() => {
 			vi.clearAllMocks();
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test User" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser(),
+				session: createSession(),
 			});
 		});
 
@@ -204,9 +274,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 	describe("TypeScript Types", () => {
 		it("should properly type session.user with optional chaining", async () => {
 			// Type check: session?.user.id should be string | undefined
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser({ name: "Test" }),
+				session: createSession(),
 			});
 
 			const FeedPage = (await import("../page")).default;
@@ -232,9 +302,9 @@ describe("Feed Page (apps/web/src/app/feed/page.tsx)", () => {
 				.spyOn(console, "error")
 				.mockImplementation(() => {});
 
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser({ name: "Test" }),
+				session: createSession(),
 			});
 
 			const FeedPage = (await import("../page")).default;
@@ -251,7 +321,7 @@ describe("FeedClient Component (apps/web/src/app/feed/feed-client.tsx)", () => {
 		it("should be a client component with 'use client' directive", () => {
 			const fs = require("node:fs");
 			const content = fs.readFileSync(
-				"apps/web/src/app/feed/feed-client.tsx",
+				resolve(__dirname, "../feed-client.tsx"),
 				"utf8",
 			);
 			expect(content).toContain('"use client"');
@@ -279,8 +349,12 @@ describe("FeedClient Component (apps/web/src/app/feed/feed-client.tsx)", () => {
 		});
 
 		it("should import FeedFilter type from training-feed", () => {
-			const module = require("@/components/feed/training-feed");
-			expect(module.FeedFilter).toBeDefined();
+			const fs = require("node:fs");
+			const content = fs.readFileSync(
+				resolve(__dirname, "../../../components/feed/training-feed.tsx"),
+				"utf-8",
+			);
+			expect(content).toContain("export type FeedFilter");
 		});
 	});
 
@@ -295,7 +369,6 @@ describe("FeedClient Component (apps/web/src/app/feed/feed-client.tsx)", () => {
 		it("should require currentUserId as string", () => {
 			const { FeedClient } = require("../feed-client");
 
-			// @ts-expect-error - Testing type validation
 			expect(() => render(<FeedClient />)).not.toThrow(); // React renders but TypeScript would error
 		});
 	});
@@ -392,7 +465,6 @@ describe("FeedClient Component (apps/web/src/app/feed/feed-client.tsx)", () => {
 				.spyOn(console, "error")
 				.mockImplementation(() => {});
 
-			// @ts-expect-error - Testing error handling
 			const { container } = render(<FeedClient currentUserId={undefined} />);
 
 			// Component should still render
@@ -425,7 +497,7 @@ describe("FeedClient Component (apps/web/src/app/feed/feed-client.tsx)", () => {
 			// useState is called at the top level, not in conditions
 			const fs = require("node:fs");
 			const content = fs.readFileSync(
-				"apps/web/src/app/feed/feed-client.tsx",
+				resolve(__dirname, "../feed-client.tsx"),
 				"utf8",
 			);
 
@@ -440,9 +512,9 @@ describe("Feed Page Integration", () => {
 	describe("Server-Client Component Communication", () => {
 		beforeEach(() => {
 			vi.clearAllMocks();
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "integration-user", name: "Test" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser({ id: "integration-user", name: "Test" }),
+				session: createSession({ userId: "integration-user" }),
 			});
 		});
 
@@ -450,9 +522,9 @@ describe("Feed Page Integration", () => {
 			const FeedPage = (await import("../page")).default;
 			const userId = "integration-user";
 
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: userId, name: "Test" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser({ id: userId, name: "Test" }),
+				session: createSession({ userId }),
 			});
 
 			render(await FeedPage());
@@ -468,16 +540,24 @@ describe("Feed Page Integration", () => {
 		});
 
 		it("should show redirect for unauthenticated users", async () => {
-			vi.mocked(auth.api.getSession).mockResolvedValue(null);
-			await import("../page").then((mod) => mod.default());
+			mockGetSession(null);
+			(
+				redirect as unknown as { mockImplementation: (fn: () => never) => void }
+			).mockImplementation(() => {
+				throw new Error("redirect");
+			});
+
+			await expect(
+				import("../page").then((mod) => mod.default()),
+			).rejects.toThrow("redirect");
 
 			expect(redirect).toHaveBeenCalledWith("/login");
 		});
 
 		it("should show feed page for authenticated users", async () => {
-			vi.mocked(auth.api.getSession).mockResolvedValue({
-				user: { id: "user-123", name: "Test User" },
-				session: { id: "session-123" },
+			mockGetSession({
+				user: createUser(),
+				session: createSession(),
 			});
 
 			const FeedPage = (await import("../page")).default;

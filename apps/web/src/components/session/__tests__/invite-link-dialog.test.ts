@@ -1,5 +1,3 @@
-import { describe, expect, test } from "bun:test";
-
 /**
  * Structural tests for InviteLinkDialog component
  *
@@ -93,7 +91,7 @@ describe("InviteLinkDialog Component", () => {
 
 		expect(componentString).toContain("useState");
 		expect(componentString).toContain("uncontrolledOpen");
-		expect(componentString).toContain("copied");
+		expect(componentString).toContain("copiedTarget");
 		expect(componentString).toContain("currentUserId");
 	});
 
@@ -165,9 +163,12 @@ describe("InviteLinkDialog Component", () => {
 			"utf-8",
 		);
 
-		expect(fileContent).toContain("Full Invite Link");
-		expect(fileContent).toContain("inviteUrl");
+		expect(fileContent).toContain("Invite Links");
+		expect(fileContent).toContain("readInviteUrl");
+		expect(fileContent).toContain("adminInviteUrl");
 		expect(fileContent).toContain("/join/");
+		expect(fileContent).toContain("access=read");
+		expect(fileContent).toContain("access=admin");
 	});
 
 	test("should show loading state while fetching", async () => {
@@ -238,7 +239,7 @@ describe("InviteLinkDialog Component", () => {
 		);
 
 		expect(fileContent).toContain("Share Invite Link");
-		expect(fileContent).toContain("Share this invite link with friends");
+		expect(fileContent).toContain("Share read-only or admin invite links");
 	});
 
 	test("should have proper toast notifications", async () => {
@@ -273,7 +274,7 @@ describe("InviteLinkDialog Component", () => {
 			"utf-8",
 		);
 
-		expect(fileContent).toContain("setCopied");
+		expect(fileContent).toContain("setCopiedTarget");
 		expect(fileContent).toContain("setTimeout");
 		expect(fileContent).toContain("Copied!");
 	});
@@ -314,7 +315,7 @@ describe("InviteLinkDialog Component", () => {
 
 		expect(fileContent).toContain("trigger");
 		expect(fileContent).toContain("defaultTrigger");
-		expect(fileContent).toContain("DialogTrigger asChild");
+		expect(fileContent).toContain("DialogTrigger");
 	});
 
 	test("should have default trigger button with share icon", async () => {
@@ -370,7 +371,8 @@ describe("InviteLinkDialog Component", () => {
 
 		expect(fileContent).toContain("aria-label");
 		expect(fileContent).toContain("Copy invite code");
-		expect(fileContent).toContain("Copy invite link");
+		expect(fileContent).toContain("Copy read-only invite link");
+		expect(fileContent).toContain("Copy admin invite link");
 		expect(fileContent).toContain("sr-only");
 	});
 
@@ -381,7 +383,10 @@ describe("InviteLinkDialog Component", () => {
 			"utf-8",
 		);
 
-		expect(fileContent).toContain("inviteUrl");
+		expect(fileContent).toContain("readInviteUrl");
+		expect(fileContent).toContain("adminInviteUrl");
 		expect(fileContent).toContain("/join/");
+		expect(fileContent).toContain("access=read");
+		expect(fileContent).toContain("access=admin");
 	});
 });

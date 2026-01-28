@@ -1,6 +1,7 @@
 "use client";
 
-import { CheckCircle2, Circle, Dumbbell, Loader2, PenLine } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
+import { CheckCircle2, Circle, Dumbbell, PenLine } from "lucide-react";
 import { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -9,6 +10,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 import { cn } from "@/lib/utils";
 import { trpc } from "@/utils/trpc";
+import { ExerciseChecklistSkeleton } from "./exercise-checklist-skeleton";
 
 interface ExerciseChecklistProps {
 	sessionId: string;
@@ -128,10 +130,10 @@ export function ExerciseChecklist({
 	}, [exercises, progressMap, optimisticUpdates]);
 
 	// tRPC mutation for recording exercise completion (toast removed, handled in optimistic callback)
-	const recordProgress = trpc.progress.record.useMutation();
+	const recordProgress = useMutation(trpc.progress.record.mutationOptions());
 
 	// tRPC mutation for deleting exercise progress (toast removed, handled in optimistic callback)
-	const deleteProgress = trpc.progress.delete.useMutation();
+	const deleteProgress = useMutation(trpc.progress.delete.mutationOptions());
 
 	// Handle checkbox change with optimistic updates
 	const handleCheckboxChange = useCallback(
@@ -148,10 +150,10 @@ export function ExerciseChecklist({
 					{
 						sessionId,
 						exerciseId: exercise.id,
-						completedReps: JSON.stringify(completedReps),
+						completedReps,
 					},
 					{
-						onError: (error) => {
+						onError: (error: { message: string }) => {
 							// Rollback optimistic update on error
 							setOptimisticUpdates((prev) => {
 								const next = new Map(prev);
@@ -167,6 +169,7 @@ export function ExerciseChecklist({
 								next.delete(exercise.id);
 								return next;
 							});
+							toast.success(`Completed ${exercise.name}`);
 						},
 					},
 				);
@@ -178,7 +181,7 @@ export function ExerciseChecklist({
 							id: exercise.progress.id,
 						},
 						{
-							onError: (error) => {
+							onError: (error: { message: string }) => {
 								// Rollback optimistic update on error
 								setOptimisticUpdates((prev) => {
 									const next = new Map(prev);
@@ -194,6 +197,7 @@ export function ExerciseChecklist({
 									next.delete(exercise.id);
 									return next;
 								});
+								toast.success(`Marked ${exercise.name} incomplete`);
 							},
 						},
 					);
@@ -218,11 +222,11 @@ export function ExerciseChecklist({
 	const completionPercentage =
 		totalCount > 0 ? Math.round((completedCount / totalCount) * 100) : 0;
 
-	// Loading state
+	// Loading state with skeleton
 	if (exercisesLoading || progressLoading) {
 		return (
-			<div className={cn("flex items-center justify-center py-8", className)}>
-				<Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+			<div className={cn(className)}>
+				<ExerciseChecklistSkeleton count={3} />
 			</div>
 		);
 	}

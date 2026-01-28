@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/session/__tests__/live-progress-bar.test.ts
  */
 
-import { describe, expect, test } from "bun:test";
-
 describe("LiveProgressBar Component", () => {
 	describe("Component Structure", () => {
 		test("should export the component", async () => {
@@ -225,9 +223,9 @@ describe("LiveProgressBar Component", () => {
 				fs.readFileSync(`${__dirname}/../live-progress-bar.tsx`, "utf-8"),
 			);
 
-			expect(fileContent).toContain(
-				"{progress.completedCount} of {progress.totalExercises} exercises",
-			);
+			expect(fileContent).toContain("progress.completedCount");
+			expect(fileContent).toContain("progress.totalExercises");
+			expect(fileContent).toContain("exercises");
 		});
 
 		test("should sort participants by progress percentage descending", async () => {

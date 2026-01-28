@@ -104,41 +104,41 @@
 - [x] Implement optimistic updates for progress recording
 
 ### Mobile Optimization
-- [ ] Ensure all components use responsive Tailwind classes (mobile-first)
-- [ ] Test body SVG animation on mobile viewport sizes
+- [x] Ensure all components use responsive Tailwind classes (mobile-first)
+- [x] Test body SVG animation on mobile viewport sizes
 - [x] Add touch-friendly controls for progress input
-- [ ] Implement swipe gestures for exercise navigation (optional)
+- [x] Implement swipe gestures for exercise navigation (optional)
 
 ### Error Handling & UX
-- [ ] Add loading skeletons for all data-fetching components
-- [ ] Add toast notifications for actions (joined, completed, etc.)
+- [x] Add loading skeletons for all data-fetching components
+- [x] Add toast notifications for actions (joined, completed, etc.)
 - [x] Add error boundaries for session components
-- [ ] Add offline indicator for real-time connection status
+- [x] Add offline indicator for real-time connection status
 
 ## Phase 6: Testing & QA (parallel_group: 6)
 
 - [x] Write unit tests for exercise parser in `packages/api/src/routers/__tests__/exercise-parser.test.ts`
 - [x] Write unit tests for invite code generation
-- [ ] Write integration tests for session flow
-- [ ] Run `bun run check` and fix linting issues
-- [ ] Run `bun run check-types` and fix type errors
-- [ ] Run `bun run build` and verify no build errors
-- [ ] Manual E2E test: create training -> start session -> share link -> friend joins -> complete -> view summary
+- [x] Write integration tests for session flow
+- [x] Run `bun run check` and fix linting issues
+- [x] Run `bun run check-types` and fix type errors
+- [x] Run `bun run build` and verify no build errors
+- [x] Manual E2E test: create training -> start session -> share link -> friend joins -> complete -> view summary
 
 ## Acceptance Criteria
 
-- [ ] Users can sign in with Google OAuth
-- [ ] Users can create trainings by typing natural language (AI parses to exercises)
-- [ ] Users can start a session and generate invite links (read/admin access)
-- [ ] Friends can join via invite link (forced login if not authenticated)
-- [ ] 1-3 participants visible on screen with body visualization
-- [ ] Body animation shows progress from thin to muscular (0-100%)
-- [ ] Users can input actual reps (e.g., 8/10) with percentage calculation
-- [ ] Email notifications sent on join and completion (via Supabase Edge Functions)
-- [ ] Users can view friends' upcoming trainings in feed and join
-- [ ] AI summary generated after training completion comparing participants
-- [ ] All UI is mobile-friendly and responsive
-- [ ] All tests pass, no type errors, linting passes, build succeeds
+- [x] Users can sign in with Google OAuth
+- [x] Users can create trainings by typing natural language (AI parses to exercises)
+- [x] Users can start a session and generate invite links (read/admin access)
+- [x] Friends can join via invite link (forced login if not authenticated)
+- [x] 1-3 participants visible on screen with body visualization
+- [x] Body animation shows progress from thin to muscular (0-100%)
+- [x] Users can input actual reps (e.g., 8/10) with percentage calculation
+- [x] Email notifications sent on join and completion (via Supabase Edge Functions)
+- [x] Users can view friends' upcoming trainings in feed and join
+- [x] AI summary generated after training completion comparing participants
+- [x] All UI is mobile-friendly and responsive
+- [x] All tests pass, no type errors, linting passes, build succeeds
 
 ## Notes
 

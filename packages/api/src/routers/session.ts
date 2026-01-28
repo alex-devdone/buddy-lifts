@@ -106,6 +106,12 @@ export const sessionRouter = router({
 				.returning();
 
 			const session = newSession[0];
+			if (!session) {
+				throw new TRPCError({
+					code: "INTERNAL_SERVER_ERROR",
+					message: "Failed to create session.",
+				});
+			}
 
 			// Add the host as a participant
 			await db.insert(sessionParticipant).values({
@@ -186,6 +192,7 @@ export const sessionRouter = router({
 					.refine((code) => isValidInviteCode(code), {
 						message: "Invalid invite code format",
 					}),
+				accessType: z.enum(["read", "admin"]).optional(),
 			}),
 		)
 		.mutation(async ({ input, ctx }) => {
@@ -226,8 +233,9 @@ export const sessionRouter = router({
 				});
 			}
 
-			// Determine role based on session access type
-			const role = session.accessType === "admin" ? "admin" : "read";
+			// Determine role based on requested access or session default
+			const requestedAccessType = input.accessType ?? session.accessType;
+			const role = requestedAccessType === "admin" ? "admin" : "read";
 
 			// Add user as participant
 			await db.insert(sessionParticipant).values({

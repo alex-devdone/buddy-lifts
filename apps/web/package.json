@@ -5,8 +5,9 @@
 	"scripts": {
 		"dev": "next dev --port 4989",
 		"build": "next build",
-		"start": "next start",
-		"test": "bun test"
+		"check-types": "tsc -p tsconfig.json --noEmit",
+		"start": "next start --port 4989",
+		"test": "bun test --preload ./src/test/bun-setup.ts"
 	},
 	"dependencies": {
 		"@ai-sdk/devtools": "^0.0.2",

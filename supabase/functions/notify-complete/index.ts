@@ -64,8 +64,18 @@ serve(async (req) => {
 		const sessionId = record.id as string;
 
 		// Initialize Supabase client
-		const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-		const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+		const supabaseUrl = Deno.env.get("SUPABASE_URL");
+		const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
+		if (!supabaseUrl || !supabaseServiceKey) {
+			console.error("Missing Supabase environment variables");
+			return new Response(
+				JSON.stringify({ error: "Supabase environment variables not set" }),
+				{
+					status: 500,
+					headers: { ...corsHeaders, "Content-Type": "application/json" },
+				},
+			);
+		}
 		const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
 		// Fetch session details with training info
@@ -100,7 +110,7 @@ serve(async (req) => {
 			.from("sessionParticipant")
 			.select(
 				`
-        odUserId,
+        userId,
         role,
         joinedAt,
         user:users(
@@ -138,7 +148,7 @@ serve(async (req) => {
 		// Fetch all progress records for this session
 		const { data: progressRecords, error: progressError } = await supabase
 			.from("exerciseProgress")
-			.select("odUserId, exerciseId, completedReps, completedAt")
+			.select("userId, exerciseId, completedReps, completedAt")
 			.eq("sessionId", sessionId);
 
 		if (progressError) {
@@ -148,8 +158,7 @@ serve(async (req) => {
 		// Calculate completion stats per participant
 		const participantStats = participants.map((participant) => {
 			const userProgress =
-				progressRecords?.filter((p) => p.odUserId === participant.odUserId) ||
-				[];
+				progressRecords?.filter((p) => p.userId === participant.userId) || [];
 
 			const totalSets = exercises.reduce((sum, ex) => sum + ex.targetSets, 0);
 			const completedSets = userProgress.reduce(
@@ -162,7 +171,7 @@ serve(async (req) => {
 				totalSets > 0 ? Math.round((completedSets / totalSets) * 100) : 0;
 
 			return {
-				userId: participant.odUserId,
+				userId: participant.userId,
 				name: participant.user.name,
 				email: participant.user.email,
 				role: participant.role,

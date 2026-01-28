@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/app/trainings/[id]/summary/__tests__/session-summary.test.tsx
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("Session Summary Client Component", () => {
 	it("should be a client component", () => {
 		const fs = require("node:fs");

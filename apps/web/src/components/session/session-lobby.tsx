@@ -2,12 +2,13 @@
 
 import { useMutation } from "@tanstack/react-query";
 import { Copy, Loader2, Lock, LockOpen, Users } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useSupabaseQuery } from "@/hooks/use-supabase-query";
 import { trpc } from "@/utils/trpc";
+import { SessionLobbySkeleton } from "./session-lobby-skeleton";
 
 interface SessionLobbyProps {
 	sessionId: string;
@@ -55,6 +56,8 @@ export function SessionLobby({
 	onSessionLeave,
 }: SessionLobbyProps) {
 	const [copied, setCopied] = useState(false);
+	const participantIdsRef = useRef<Set<string>>(new Set());
+	const hasLoadedParticipantsRef = useRef(false);
 
 	// Fetch session data using Supabase (read)
 	const {
@@ -151,6 +154,37 @@ export function SessionLobby({
 	// Determine if current user is host
 	const isHost = currentUserId && session?.hostUserId === currentUserId;
 
+	useEffect(() => {
+		if (participantsLoading) {
+			return;
+		}
+
+		const currentParticipantIds = new Set(participants.map((p) => p.userId));
+
+		if (!hasLoadedParticipantsRef.current) {
+			participantIdsRef.current = currentParticipantIds;
+			hasLoadedParticipantsRef.current = true;
+			return;
+		}
+
+		const newParticipants = participants.filter(
+			(participant) => !participantIdsRef.current.has(participant.userId),
+		);
+
+		if (newParticipants.length > 0) {
+			newParticipants.forEach((participant) => {
+				if (participant.userId === currentUserId) {
+					return;
+				}
+				const label =
+					participant.user?.name || participant.user?.email || "A participant";
+				toast.success(`${label} joined the session`);
+			});
+		}
+
+		participantIdsRef.current = currentParticipantIds;
+	}, [participants, participantsLoading, currentUserId]);
+
 	// Copy invite link to clipboard
 	const handleCopyInviteLink = useCallback(() => {
 		if (!session?.inviteCode) return;
@@ -199,11 +233,7 @@ export function SessionLobby({
 	}, [sessionId, endSession]);
 
 	if (sessionLoading || participantsLoading) {
-		return (
-			<div className="flex items-center justify-center py-12">
-				<Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-			</div>
-		);
+		return <SessionLobbySkeleton />;
 	}
 
 	if (sessionError || !session) {

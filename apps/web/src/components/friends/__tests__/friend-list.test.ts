@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/friends/__tests__/friend-list.test.ts
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("FriendList Component", () => {
 	describe("Component Structure", () => {
 		it("should export the component", () => {
@@ -208,7 +206,7 @@ describe("FriendList Component", () => {
 				"utf-8",
 			);
 			expect(content).toContain("isLoading");
-			expect(content).toContain("Loader2");
+			expect(content).toContain("FriendCardSkeleton");
 		});
 
 		it("should show empty state when no friends", () => {

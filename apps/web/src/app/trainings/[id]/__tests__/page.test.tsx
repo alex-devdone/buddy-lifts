@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/app/trainings/[id]/__tests__/page.test.tsx
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("Training Detail Page Component", () => {
 	describe("Component Structure", () => {
 		it("should export the page component", () => {
@@ -438,7 +436,7 @@ describe("Training Detail Client Component", () => {
 				"utf-8",
 			);
 			expect(content).toContain("Dumbbell");
-			expect(content).toContain("{training.name}");
+			expect(content).toContain("{training[0]?.name}");
 		});
 
 		it("should display training description if present", () => {
@@ -447,7 +445,7 @@ describe("Training Detail Client Component", () => {
 				`${__dirname}/../training-detail.tsx`,
 				"utf-8",
 			);
-			expect(content).toContain("training.description &&");
+			expect(content).toContain("training[0]?.description &&");
 			expect(content).toContain("line-clamp-2");
 		});
 
@@ -525,7 +523,7 @@ describe("Training Detail Client Component", () => {
 			expect(content).toContain("<ExerciseList");
 			expect(content).toContain("trainingId={trainingId}");
 			expect(content).toContain("currentUserId={currentUserId}");
-			expect(content).toContain("trainingUserId={training.userId}");
+			expect(content).toContain("trainingUserId={training[0]?.userId}");
 		});
 
 		it("should have edit training dialog", () => {
@@ -547,7 +545,7 @@ describe("Training Detail Client Component", () => {
 				"utf-8",
 			);
 			expect(content).toContain(
-				"const isOwner = currentUserId === training.userId",
+				"const isOwner = currentUserId === training[0]?.userId",
 			);
 		});
 
@@ -567,7 +565,7 @@ describe("Training Detail Client Component", () => {
 				"utf-8",
 			);
 			expect(content).toContain("formatDistanceToNow");
-			expect(content).toContain("new Date(training.createdAt)");
+			expect(content).toContain('new Date(training[0]?.createdAt || "")');
 			expect(content).toContain("addSuffix: true");
 		});
 

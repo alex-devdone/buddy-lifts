@@ -4,8 +4,6 @@
  * Run with: bun test apps/web/src/components/training/__tests__/exercise-list.test.tsx
  */
 
-import { describe, expect, it } from "vitest";
-
 describe("ExerciseList Component", () => {
 	describe("Component Structure", () => {
 		it("should export the component", () => {

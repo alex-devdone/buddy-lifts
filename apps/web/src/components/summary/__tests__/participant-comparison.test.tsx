@@ -6,12 +6,7 @@
  * Tests the visual comparison chart component displaying participants' performance side-by-side.
  */
 
-import { describe, expect, it } from "vitest";
-import {
-	ParticipantComparison,
-	ParticipantComparisonError,
-	ParticipantComparisonLoading,
-} from "../participant-comparison";
+import { ParticipantComparison } from "../participant-comparison";
 
 describe("ParticipantComparison Component", () => {
 	describe("Component Structure", () => {

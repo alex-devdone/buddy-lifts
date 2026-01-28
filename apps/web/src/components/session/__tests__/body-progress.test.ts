@@ -1,4 +1,11 @@
-import { describe, expect, test } from "bun:test";
+import { readFileSync } from "node:fs";
+
+const bodyProgressPath =
+	"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx";
+const readBodyProgressFile = () => readFileSync(bodyProgressPath, "utf-8");
+
+process.env.NEXT_PUBLIC_SUPABASE_URL ??= "https://test.supabase.co";
+process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ??= "test-anon-key";
 
 /**
  * Structural tests for BodyProgress component
@@ -75,10 +82,7 @@ describe("BodyProgress Component", () => {
 	});
 
 	test("should have exercise to muscle group mapping", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		// Verify EXERCISE_MUSCLE_MAP exists with key exercises
 		expect(fileContent).toContain("bench");
@@ -89,10 +93,7 @@ describe("BodyProgress Component", () => {
 	});
 
 	test("should have detectMuscleGroups function", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		expect(fileContent).toContain("detectMuscleGroups");
 	});
@@ -140,11 +141,15 @@ describe("BodyProgress Component", () => {
 		expect(componentString).toContain("0.003");
 	});
 
+	test("should scale overall body based on total progress", async () => {
+		const fileContent = readBodyProgressFile();
+
+		expect(fileContent).toContain("getBodyScale");
+		expect(fileContent).toContain("overallProgress");
+	});
+
 	test("should have size classes for responsive sizing", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		expect(fileContent).toContain("getSizeClasses");
 		expect(fileContent).toContain("h-32");
@@ -153,6 +158,19 @@ describe("BodyProgress Component", () => {
 		expect(fileContent).toContain("w-32");
 		expect(fileContent).toContain("h-64");
 		expect(fileContent).toContain("w-48");
+	});
+
+	test("should return mobile size classes for small viewports", () => {
+		const sizeClassesPromise = import("../body-progress").then((module) =>
+			module.getSizeClasses("sm"),
+		);
+
+		return sizeClassesPromise.then((sizeClasses) => {
+			expect(sizeClasses).toContain("h-full");
+			expect(sizeClasses).toContain("w-full");
+			expect(sizeClasses).toContain("h-32");
+			expect(sizeClasses).toContain("w-24");
+		});
 	});
 
 	test("should handle loading state", async () => {
@@ -192,10 +210,7 @@ describe("BodyProgress Component", () => {
 
 	test("should use client directive", async () => {
 		// Read the file content to check for "use client"
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 		expect(fileContent).toContain('"use client"');
 	});
 
@@ -224,10 +239,7 @@ describe("BodyProgress Component", () => {
 	});
 
 	test("should have all muscle groups in type definition", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		expect(fileContent).toContain("chest");
 		expect(fileContent).toContain("back");
@@ -241,10 +253,7 @@ describe("BodyProgress Component", () => {
 	});
 
 	test("should have interface definitions", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		expect(fileContent).toContain("interface BodyProgressProps");
 		expect(fileContent).toContain("interface ExerciseProgress");
@@ -252,10 +261,7 @@ describe("BodyProgress Component", () => {
 	});
 
 	test("should have MuscleGroup type", async () => {
-		const file = Bun.file(
-			"/Users/klik1301/work/my/buddy-lifts/apps/web/src/components/session/body-progress.tsx",
-		);
-		const fileContent = await file.text();
+		const fileContent = readBodyProgressFile();
 
 		expect(fileContent).toContain("type MuscleGroup");
 	});

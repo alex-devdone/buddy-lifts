@@ -6,6 +6,7 @@ import { JoinPageClient } from "./join-page-client";
 
 interface PageProps {
 	params: Promise<{ code: string }>;
+	searchParams: Promise<{ access?: string }>;
 }
 
 /**
@@ -22,7 +23,7 @@ interface PageProps {
  * The invite code is saved in localStorage on the login page
  * so users can be redirected back after authentication.
  */
-export default async function JoinPage({ params }: PageProps) {
+export default async function JoinPage({ params, searchParams }: PageProps) {
 	const session = await auth.api.getSession({
 		headers: await headers(),
 	});
@@ -31,7 +32,11 @@ export default async function JoinPage({ params }: PageProps) {
 		// Not authenticated - redirect to login with invite code
 		// The login page will save this code and redirect back after auth
 		const { code } = await params;
-		redirect(`/login?redirect=/join/${code}`);
+		const { access } = await searchParams;
+		const accessParam =
+			access === "read" || access === "admin" ? `?access=${access}` : "";
+		const redirectPath = `/join/${code}${accessParam}`;
+		redirect(`/login?redirect=${encodeURIComponent(redirectPath)}`);
 	}
 
 	const { code: inviteCode } = await params;
